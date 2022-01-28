@@ -1,0 +1,12 @@
+openapi: 3.0.3
+info:
+  title: SynergyAcademy
+  description: SynergyAcademy
+  version: 1.0.0
+paths:
+  /students:
+    get:
+      operationId: getStudents
+      responses:
+        200:
+          description: OK
