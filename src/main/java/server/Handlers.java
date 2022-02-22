@@ -2,6 +2,7 @@ package server;
 
 import com.google.inject.Inject;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
 import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.ext.web.RoutingContext;
 import org.javatuples.Pair;
@@ -27,6 +28,11 @@ public class Handlers {
     }
 
     private void getStudents(RoutingContext context) {
-
+        vertx.eventBus()
+                .<JsonArray>rxRequest("get.students.all", "")
+                .subscribe(
+                        result -> context.end(result.body().encodePrettily()),
+                        error -> context.response().setStatusCode(500).end(error.getMessage())
+                );
     }
 }

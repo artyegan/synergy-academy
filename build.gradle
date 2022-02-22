@@ -18,6 +18,7 @@ dependencies {
 
     //DB
     implementation 'io.vertx:vertx-pg-client:4.2.4'
+    implementation 'com.ongres.scram:client:2.1'
 
     //DI
     implementation 'com.google.inject:guice:5.1.0'
