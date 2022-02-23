@@ -3,6 +3,7 @@ package students;
 import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.core.eventbus.Message;
 import org.apache.logging.log4j.LogManager;
@@ -27,7 +28,10 @@ public class StudentsVerticle extends AbstractVerticle {
     }
 
     private Single<JsonArray> getAllStudentsRequest() {
-        return vertx.eventBus().<JsonArray>rxRequest("get.students.service.all", "")
+        return vertx.eventBus().<JsonArray>rxRequest("get.all.service",
+                        new JsonArray()
+                                .add(new JsonObject()
+                                        .put("keyword", "_student")))
                 .map(Message::body);
     }
 }

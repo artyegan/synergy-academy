@@ -13,7 +13,7 @@ import io.vertx.sqlclient.PoolOptions;
 import server.Handlers;
 import server.RouterBuilderVerticle;
 import server.VerticleDeployer;
-import services.StudentsServiceVerticle;
+import services.DataServiceVerticle;
 import students.StudentsVerticle;
 
 import java.util.Set;
@@ -67,7 +67,7 @@ public class ProviderModule extends AbstractModule {
 
     @Inject
     @ProvidesIntoSet
-    public Verticle provideStudentsServiceVerticle(PgPool pgPool) {
-        return new StudentsServiceVerticle(pgPool);
+    public Verticle provideDataServiceVerticle(PgPool pgPool) {
+        return new DataServiceVerticle(pgPool);
     }
 }
