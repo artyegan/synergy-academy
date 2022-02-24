@@ -47,7 +47,7 @@ public class DataServiceVerticle extends AbstractVerticle {
                 .map(row -> this.addRowToJson(columnNames, row))
                 .toList()
                 .subscribe(list -> {
-                    LOGGER.info("Get All Data From DB");
+                    LOGGER.info("Got All Data From DB");
                     msg.reply(new JsonArray(list));
                 }, error -> {
                     LOGGER.error(error);
