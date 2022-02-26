@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.ProvidesIntoSet;
+import com.google.inject.name.Names;
 import io.vertx.core.Verticle;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.reactivex.core.Vertx;
@@ -16,23 +17,56 @@ import server.VerticleDeployer;
 import services.DataServiceVerticle;
 import students.StudentsVerticle;
 
+import javax.inject.Named;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Properties;
 import java.util.Set;
 
 public class ProviderModule extends AbstractModule {
 
-    @Provides
-    @Inject
-    private static PgPool providePgPool(Vertx vertx) {
-        return PgPool.pool(vertx, setConnectionOptions(), new PoolOptions());
+    private void setConfigsFile(Path path) {
+        Properties properties = new Properties();
+        try {
+            properties.load(new FileReader(path.toFile()));
+            Names.bindProperties(binder(), properties);
+        } catch (FileNotFoundException e) {
+            System.out.println("The configuration file" + path.getFileName() + "can not be found");
+        } catch (IOException e) {
+            System.out.println("I/O Exception during loading configuration");
+        }
     }
 
-    private static PgConnectOptions setConnectionOptions() {
+    @Override
+    protected void configure() {
+        setConfigsFile(Path.of("src/main/resources/configs.properties"));
+    }
+
+    @Inject
+    @Provides
+    private static PgPool providePgPool(Vertx vertx,
+                                        @Named("port") int port,
+                                        @Named("host") String host,
+                                        @Named("database") String database,
+                                        @Named("user") String user,
+                                        @Named("password") String password) {
+        return PgPool.pool(vertx, setConnectionOptions(port, host, database, user, password), new PoolOptions());
+    }
+
+    @Inject
+    private static PgConnectOptions setConnectionOptions(int port,
+                                                         String host,
+                                                         String database,
+                                                         String user,
+                                                         String password) {
         return new PgConnectOptions()
-                .setPort(5432)
-                .setHost("localhost")
-                .setDatabase("academy_phase1")
-                .setUser("postgres")
-                .setPassword("postgres");
+                .setPort(port)
+                .setHost(host)
+                .setDatabase(database)
+                .setUser(user)
+                .setPassword(password);
     }
 
     @Provides
@@ -41,8 +75,8 @@ public class ProviderModule extends AbstractModule {
         return Vertx.vertx();
     }
 
-    @Provides
     @Inject
+    @Provides
     @Singleton
     public Handlers provideHandlers(Vertx vertx) {
         return new Handlers(vertx);
@@ -56,13 +90,14 @@ public class ProviderModule extends AbstractModule {
 
     @Inject
     @ProvidesIntoSet
-    public Verticle provideRouterBuilderVerticle(Handlers handlers) {
-        return new RouterBuilderVerticle(handlers);
+    public Verticle provideRouterBuilderVerticle(Handlers handlers, @Named("serverPort") int serverPort) {
+        return new RouterBuilderVerticle(handlers, serverPort);
     }
 
+    @Inject
     @ProvidesIntoSet
-    public Verticle provideStudentsVerticle() {
-        return new StudentsVerticle();
+    public Verticle provideStudentsVerticle(@Named("studentsDB") String studentsDB) {
+        return new StudentsVerticle(studentsDB);
     }
 
     @Inject

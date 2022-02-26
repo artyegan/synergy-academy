@@ -58,9 +58,7 @@ public class DataServiceVerticle extends AbstractVerticle {
     private JsonObject addRowToJson(List<String> columnNames, Row row) {
         JsonObject jsonObject = new JsonObject();
 
-        columnNames.forEach(columnName -> {
-            jsonObject.put(columnName, row.getValue(columnName));
-        });
+        columnNames.forEach(columnName -> jsonObject.put(columnName, row.getValue(columnName)));
 
         return jsonObject;
     }

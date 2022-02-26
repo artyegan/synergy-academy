@@ -7,14 +7,18 @@ import io.vertx.reactivex.ext.web.openapi.RouterBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.inject.Named;
+
 public class RouterBuilderVerticle extends AbstractVerticle {
 
     private static final Logger LOGGER = LogManager.getLogger(RouterBuilderVerticle.class);
     private final Handlers handlers;
+    private final int port;
 
     @Inject
-    public RouterBuilderVerticle(Handlers handlers) {
+    public RouterBuilderVerticle(Handlers handlers, int port) {
         this.handlers = handlers;
+        this.port = port;
     }
 
     @Override
@@ -27,8 +31,8 @@ public class RouterBuilderVerticle extends AbstractVerticle {
 
                             vertx.createHttpServer()
                                     .requestHandler(routerBuilder.createRouter())
-                                    .rxListen(8080)
-                                    .subscribe(res -> LOGGER.info("Server is running on 8080"),
+                                    .rxListen(port)
+                                    .subscribe(res -> LOGGER.info("Server is running on " + port),
                                             LOGGER::error);
                         }
                         ,error -> {
