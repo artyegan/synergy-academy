@@ -5,11 +5,16 @@
             <PatternLayout
                     pattern="%d{HH:mm:ss.SSS} [%t] %-5level: %logger{36} - %msg%n" />
         </Console>
+        <File name="file" fileName="synergy-academy.log" append="true">
+            <PatternLayout
+                    pattern="%d{HH:mm:ss.SSS} [%t] %-5level: %logger{36} - %msg%n" />
+        </File>
     </Appenders>
     <Loggers>
         <!-- Root logger referring to console appender -->
-        <Root level="info" additivity="false">
-            <AppenderRef ref="console" />
-        </Root>
+        <AsyncRoot level="info" additivity="false">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="file"/>
+        </AsyncRoot>
     </Loggers>
 </Configuration>

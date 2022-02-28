@@ -5,3 +5,5 @@ build
 # Ignore idea configs
 .idea
 config
+# Ignore log file
+synergy-academy.log

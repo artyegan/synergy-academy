@@ -34,11 +34,11 @@ public class DataServiceVerticle extends AbstractVerticle {
     private void getAllHandler(Message<JsonArray> msg) {
 
         List<String> columnNames = new ArrayList<>();
+        String keyword = msg.body()
+                .getJsonObject(0)
+                .getString("keyword");
 
-        pgPool.preparedQuery(SqlQuerries.getAllQuerry(
-                        msg.body()
-                                .getJsonObject(0)
-                                .getString("keyword")))
+        pgPool.preparedQuery(SqlQuerries.getAllQuerry(keyword))
                 .rxExecute()
                 .map(rowSet -> {
                     columnNames.addAll(rowSet.columnsNames());
@@ -48,7 +48,7 @@ public class DataServiceVerticle extends AbstractVerticle {
                 .map(row -> this.addRowToJson(columnNames, row))
                 .toList()
                 .subscribe(list -> {
-                    LOGGER.info("Got All Data From DB");
+                    LOGGER.info("Got all " + keyword + " from db");
                     msg.reply(new JsonArray(list));
                 }, error -> {
                     LOGGER.error(error);
