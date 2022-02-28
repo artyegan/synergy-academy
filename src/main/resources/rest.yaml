@@ -6,7 +6,17 @@ info:
 paths:
   /students:
     get:
-      operationId: getStudents
+      operationId: getAllStudents
       responses:
         200:
           description: OK
+        500:
+          description: error while getting all students
+  /courses:
+    get:
+      operationId: getAllCourses
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while getting all courses

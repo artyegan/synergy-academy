@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import querries.SqlQuerries;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class DataServiceVerticle extends AbstractVerticle {
     }
 
     @Override
-    public void start() throws Exception {
+    public void start() {
         vertx.eventBus().consumer("get.all.service", this::getAllHandler);
     }
 
@@ -58,7 +59,9 @@ public class DataServiceVerticle extends AbstractVerticle {
     private JsonObject addRowToJson(List<String> columnNames, Row row) {
         JsonObject jsonObject = new JsonObject();
 
-        columnNames.forEach(columnName -> jsonObject.put(columnName, row.getValue(columnName)));
+        columnNames.forEach(columnName -> jsonObject.put(columnName,
+                row.getValue(columnName) instanceof LocalDateTime ?
+                        row.getValue(columnName).toString() : row.getValue(columnName)));
 
         return jsonObject;
     }

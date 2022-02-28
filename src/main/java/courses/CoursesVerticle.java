@@ -1,4 +1,4 @@
-package students;
+package courses;
 
 import io.reactivex.Single;
 import io.vertx.core.json.JsonArray;
@@ -10,23 +10,23 @@ import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 
-public class StudentsVerticle extends AbstractVerticle {
+public class CoursesVerticle extends AbstractVerticle {
 
-    private static final Logger LOGGER = LogManager.getLogger(StudentsVerticle.class);
-    private final String studentsDB;
+    private static final Logger LOGGER = LogManager.getLogger(CoursesVerticle.class);
+    private final String coursesDB;
 
     @Inject
-    public StudentsVerticle(String studentsDB) {
-        this.studentsDB = studentsDB;
+    public CoursesVerticle(String coursesDB) {
+        this.coursesDB = coursesDB;
     }
 
     @Override
     public void start() {
-        vertx.eventBus().consumer("get.students.all", this::getAllStudents);
+        vertx.eventBus().consumer("get.courses.all", this::getAllCourses);
     }
 
-    private void getAllStudents(Message<JsonArray> msg) {
-        getAllStudentsRequest()
+    private void getAllCourses(Message<JsonArray> msg) {
+        getAllCoursesRequest()
                 .subscribe(msg::reply,
                         error -> {
                             LOGGER.error(error);
@@ -34,11 +34,11 @@ public class StudentsVerticle extends AbstractVerticle {
                         });
     }
 
-    private Single<JsonArray> getAllStudentsRequest() {
+    private Single<JsonArray> getAllCoursesRequest() {
         return vertx.eventBus().<JsonArray>rxRequest("get.all.service",
                         new JsonArray()
                                 .add(new JsonObject()
-                                        .put("keyword", studentsDB)))
+                                        .put("keyword", coursesDB)))
                 .map(Message::body);
     }
 }

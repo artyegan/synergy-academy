@@ -23,7 +23,8 @@ public class Handlers {
     public List<Pair<String, Handler<RoutingContext>>> getHandlers() {
         handlers = new ArrayList<>();
 
-        handlers.add(Pair.with("getStudents", this::getStudents));
+        handlers.add(Pair.with("getAllStudents", this::getAllStudents));
+        handlers.add(Pair.with("getAllCourses", this::getAllCourses));
 
         return handlers;
     }
@@ -36,9 +37,18 @@ public class Handlers {
                 .putHeader("Access-Control-Allow-Credentials", "true");
     }
 
-    private void getStudents(RoutingContext context) {
+    private void getAllStudents(RoutingContext context) {
         vertx.eventBus()
                 .<JsonArray>rxRequest("get.students.all", "")
+                .subscribe(
+                        result -> addResponseHeaders(context).end(result.body().encodePrettily()),
+                        error -> context.response().setStatusCode(500).end(error.getMessage())
+                );
+    }
+
+    private void getAllCourses(RoutingContext context) {
+        vertx.eventBus()
+                .<JsonArray>rxRequest("get.courses.all", "")
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())
