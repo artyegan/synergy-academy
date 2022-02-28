@@ -1,17 +1,20 @@
 <Configuration status="warn">
     <Appenders>
-        <!-- Console appender configuration -->
         <Console name="console" target="SYSTEM_OUT">
             <PatternLayout
                     pattern="%d{HH:mm:ss.SSS} [%t] %-5level: %logger{36} - %msg%n" />
         </Console>
-        <File name="file" fileName="synergy-academy.log" append="true">
+        <RollingFile name="file" fileName="synergy-academy.log" append="true" filePattern="synergy-academy%i.log">
             <PatternLayout
                     pattern="%d{HH:mm:ss.SSS} [%t] %-5level: %logger{36} - %msg%n" />
-        </File>
+            <Policies>
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="5 MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="1"/>
+        </RollingFile>
     </Appenders>
     <Loggers>
-        <!-- Root logger referring to console appender -->
         <AsyncRoot level="info" additivity="false">
             <AppenderRef ref="console"/>
             <AppenderRef ref="file"/>
