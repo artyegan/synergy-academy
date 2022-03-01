@@ -12,6 +12,20 @@ paths:
           description: OK
         500:
           description: error while getting all students
+  /students/{studentId}:
+    get:
+      operationId: getStudentById
+      parameters:
+        - in: path
+          name: studentId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while getting student by id
   /courses:
     get:
       operationId: getAllCourses

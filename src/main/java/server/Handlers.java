@@ -3,6 +3,7 @@ package server;
 import com.google.inject.Inject;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.core.http.HttpServerResponse;
 import io.vertx.reactivex.ext.web.RoutingContext;
@@ -24,6 +25,7 @@ public class Handlers {
         handlers = new ArrayList<>();
 
         handlers.add(Pair.with("getAllStudents", this::getAllStudents));
+        handlers.add(Pair.with("getStudentById", this::getStudentById));
         handlers.add(Pair.with("getAllCourses", this::getAllCourses));
 
         return handlers;
@@ -40,6 +42,15 @@ public class Handlers {
     private void getAllStudents(RoutingContext context) {
         vertx.eventBus()
                 .<JsonArray>rxRequest("get.students.all", "")
+                .subscribe(
+                        result -> addResponseHeaders(context).end(result.body().encodePrettily()),
+                        error -> context.response().setStatusCode(500).end(error.getMessage())
+                );
+    }
+
+    private void getStudentById(RoutingContext context) {
+        vertx.eventBus()
+                .<JsonObject>rxRequest("get.students.id", new JsonObject().put("studentId", context.pathParam("studentId")))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())

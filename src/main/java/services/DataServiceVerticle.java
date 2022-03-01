@@ -10,7 +10,7 @@ import io.vertx.reactivex.pgclient.PgPool;
 import io.vertx.reactivex.sqlclient.Row;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import querries.SqlQuerries;
+import querries.SqlQueries;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,16 +29,16 @@ public class DataServiceVerticle extends AbstractVerticle {
     @Override
     public void start() {
         vertx.eventBus().consumer("get.all.service", this::getAllHandler);
+        vertx.eventBus().consumer("get.id.service", this::getIdHandler);
     }
 
     private void getAllHandler(Message<JsonArray> msg) {
-
         List<String> columnNames = new ArrayList<>();
         String keyword = msg.body()
                 .getJsonObject(0)
                 .getString("keyword");
 
-        pgPool.preparedQuery(SqlQuerries.getAllQuerry(keyword))
+        pgPool.preparedQuery(SqlQueries.getAllQuery(keyword))
                 .rxExecute()
                 .map(rowSet -> {
                     columnNames.addAll(rowSet.columnsNames());
@@ -54,6 +54,31 @@ public class DataServiceVerticle extends AbstractVerticle {
                     LOGGER.error(error);
                     msg.fail(500, error.getMessage());
                 });
+    }
+
+    private void getIdHandler(Message<JsonObject> msg) {
+        String keyword = msg.body().getString("keyword");
+        String id = msg.body().getString("id");
+
+        pgPool.preparedQuery(SqlQueries.getIdQuery(keyword, id))
+                .rxExecute()
+                .map(rowSet -> {
+                    JsonObject jsonObject = new JsonObject();
+
+                    for (Row row : rowSet) {
+                        jsonObject = addRowToJson(rowSet.columnsNames(), row);
+                    }
+
+                    return jsonObject;
+                })
+                .subscribe(json -> {
+                            LOGGER.info("Got " + keyword + " by id");
+                            msg.reply(json);
+                        },
+                        error -> {
+                            LOGGER.error(error);
+                            msg.fail(500, error.getMessage());
+                        });
     }
 
     private JsonObject addRowToJson(List<String> columnNames, Row row) {

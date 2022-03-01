@@ -23,10 +23,21 @@ public class StudentsVerticle extends AbstractVerticle {
     @Override
     public void start() {
         vertx.eventBus().consumer("get.students.all", this::getAllStudents);
+        vertx.eventBus().consumer("get.students.id", this::getStudentById);
+
     }
 
     private void getAllStudents(Message<JsonArray> msg) {
         getAllStudentsRequest()
+                .subscribe(msg::reply,
+                        error -> {
+                            LOGGER.error(error);
+                            msg.fail(500, error.getMessage());
+                        });
+    }
+
+    private void getStudentById(Message<JsonObject> msg) {
+        getStudentByIdRequest(msg.body().getString("studentId"))
                 .subscribe(msg::reply,
                         error -> {
                             LOGGER.error(error);
@@ -39,6 +50,14 @@ public class StudentsVerticle extends AbstractVerticle {
                         new JsonArray()
                                 .add(new JsonObject()
                                         .put("keyword", studentsDB)))
+                .map(Message::body);
+    }
+
+    private Single<JsonObject> getStudentByIdRequest(String id) {
+        return vertx.eventBus().<JsonObject>rxRequest("get.id.service",
+                        new JsonObject()
+                                .put("keyword", studentsDB)
+                                .put("id", id))
                 .map(Message::body);
     }
 }
