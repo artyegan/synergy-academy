@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import querries.SqlQueries;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -89,7 +90,11 @@ public class DataServiceVerticle extends AbstractVerticle {
         columnNames.forEach(columnName -> {
 
             if (row.getValue(columnName) instanceof LocalDateTime) {
-                jsonObject.put(columnName, formatDateTime((LocalDateTime) row.getValue(columnName)));
+                jsonObject.put(columnName,
+                        ((LocalDateTime) row.getValue(columnName)).format(DateTimeFormatter.ofPattern("dd MMM yyyy")));
+            } else if (row.getValue(columnName) instanceof LocalDate) {
+                jsonObject.put(columnName,
+                        ((LocalDate) row.getValue(columnName)).format(DateTimeFormatter.ofPattern("dd MMM yyyy")));
             } else {
                 jsonObject.put(columnName, row.getValue(columnName));
             }
