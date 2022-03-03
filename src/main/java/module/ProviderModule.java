@@ -15,6 +15,7 @@ import io.vertx.sqlclient.PoolOptions;
 import server.Handlers;
 import server.RouterBuilderVerticle;
 import server.VerticleDeployer;
+import services.ClassifierServiceVerticle;
 import services.DataServiceVerticle;
 import students.StudentsVerticle;
 
@@ -111,5 +112,10 @@ public class ProviderModule extends AbstractModule {
     @ProvidesIntoSet
     public Verticle provideDataServiceVerticle(PgPool pgPool) {
         return new DataServiceVerticle(pgPool);
+    }
+
+    @ProvidesIntoSet
+    public Verticle provideClassifierServiceVerticle() {
+        return new ClassifierServiceVerticle();
     }
 }

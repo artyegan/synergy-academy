@@ -10,6 +10,7 @@ import io.vertx.reactivex.pgclient.PgPool;
 import io.vertx.reactivex.sqlclient.Row;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import querries.SqlQueries;
 
 import java.time.LocalDateTime;
@@ -82,7 +83,7 @@ public class DataServiceVerticle extends AbstractVerticle {
                         });
     }
 
-    private JsonObject addRowToJson(List<String> columnNames, Row row) {
+    private JsonObject addRowToJson(@NotNull List<String> columnNames, Row row) {
         JsonObject jsonObject = new JsonObject();
 
         columnNames.forEach(columnName -> {
