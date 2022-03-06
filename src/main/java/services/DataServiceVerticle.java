@@ -91,19 +91,15 @@ public class DataServiceVerticle extends AbstractVerticle {
 
             if (row.getValue(columnName) instanceof LocalDateTime) {
                 jsonObject.put(columnName,
-                        ((LocalDateTime) row.getValue(columnName)).format(DateTimeFormatter.ofPattern("dd MMM yyyy")));
+                        ((LocalDateTime) row.getValue(columnName)).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
             } else if (row.getValue(columnName) instanceof LocalDate) {
                 jsonObject.put(columnName,
-                        ((LocalDate) row.getValue(columnName)).format(DateTimeFormatter.ofPattern("dd MMM yyyy")));
+                        ((LocalDate) row.getValue(columnName)).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
             } else {
                 jsonObject.put(columnName, row.getValue(columnName));
             }
         });
 
         return jsonObject;
-    }
-
-    private String formatDateTime(LocalDateTime localDateTime) {
-        return localDateTime.format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
     }
 }
