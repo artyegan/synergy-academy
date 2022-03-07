@@ -1,4 +1,4 @@
-package querries;
+package queries;
 
 public class SqlQueries {
     public static String getAllQuery(String tableName) {

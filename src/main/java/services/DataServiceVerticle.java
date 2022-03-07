@@ -11,7 +11,7 @@ import io.vertx.reactivex.sqlclient.Row;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import querries.SqlQueries;
+import queries.SqlQueries;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
