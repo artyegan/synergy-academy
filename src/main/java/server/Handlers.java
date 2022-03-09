@@ -26,6 +26,7 @@ public class Handlers {
 
         handlers.add(Pair.with("getAllStudents", this::getAllStudents));
         handlers.add(Pair.with("getStudentById", this::getStudentById));
+        handlers.add(Pair.with("updateStudentById", this::updateStudentById));
         handlers.add(Pair.with("getAllCourses", this::getAllCourses));
         handlers.add(Pair.with("getClassifier", this::getClassifier));
 
@@ -58,6 +59,18 @@ public class Handlers {
                 );
     }
 
+    private void updateStudentById(RoutingContext context) {
+        vertx.eventBus()
+                .<JsonObject>rxRequest("update.students.id",
+                        new JsonObject()
+                                .put("id", context.pathParam("studentId"))
+                                .put("data", context.getBodyAsJson()))
+                .subscribe(
+                        result -> addResponseHeaders(context).end(result.body().encodePrettily()),
+                        error -> context.response().setStatusCode(500).end(error.getMessage())
+                );
+    }
+
     private void getAllCourses(RoutingContext context) {
         vertx.eventBus()
                 .<JsonArray>rxRequest("get.courses.all", "")
@@ -71,8 +84,8 @@ public class Handlers {
         vertx.eventBus()
                 .<JsonArray>rxRequest("get.classifier",
                         new JsonArray().add(
-                        new JsonObject()
-                                .put("keyword", "c_" + context.pathParam("tableName")))
+                                new JsonObject()
+                                        .put("keyword", "c_" + context.pathParam("tableName")))
                 )
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),

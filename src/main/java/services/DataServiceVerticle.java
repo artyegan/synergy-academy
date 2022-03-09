@@ -33,6 +33,8 @@ public class DataServiceVerticle extends AbstractVerticle {
     public void start() {
         vertx.eventBus().consumer("get.all.service", this::getAllHandler);
         vertx.eventBus().consumer("get.id.service", this::getIdHandler);
+        vertx.eventBus().consumer("update.id.service", this::updateIdHandler);
+        vertx.eventBus().consumer("get.metadata.service", this::getMetadataHandler);
     }
 
     private void getAllHandler(Message<JsonArray> msg) {
@@ -84,6 +86,54 @@ public class DataServiceVerticle extends AbstractVerticle {
                         });
     }
 
+    private void getMetadataHandler(Message<JsonArray> msg) {
+        List<String> columnNames = new ArrayList<>();
+        String keyword = msg.body()
+                .getJsonObject(0)
+                .getString("keyword");
+        String function = msg.body()
+                .getJsonObject(0)
+                .getString("function");
+        ;
+        pgPool.preparedQuery(SqlQueries.getFunctionQuery(function, keyword))
+                .rxExecute()
+                .map(rowSet -> {
+                    columnNames.addAll(rowSet.columnsNames());
+                    return rowSet;
+                })
+                .flatMapObservable(Observable::fromIterable)
+                .map(row -> this.addRowToJson(columnNames, row))
+                .toList()
+                .subscribe(list -> {
+                    LOGGER.info("Got all " + keyword + " from db");
+                    msg.reply(new JsonArray(list));
+                }, error -> {
+                    LOGGER.error(error);
+                    msg.fail(500, error.getMessage());
+                });
+    }
+
+    private void updateIdHandler(Message<JsonObject> msg) {
+        pgPool.preparedQuery(SqlQueries.updateQuery(
+                        msg.body().getJsonArray("metadata"),
+                        msg.body().getString("id"),
+                        msg.body().getString("keyword"),
+                        msg.body().getJsonObject("data")))
+                .rxExecute()
+                .subscribe(res -> {
+                            LOGGER.info(msg.body().getString("keyword") + " " +
+                                    msg.body().getString("id")
+                                    + " updated");
+                            msg.reply(new JsonObject().put("msg", msg.body().getString("keyword") + " " +
+                                    msg.body().getString("id") +
+                                    " updated"));
+                        }, error -> {
+                            LOGGER.error(error);
+                            msg.fail(500, error.getMessage());
+                        }
+                );
+    }
+
     private JsonObject addRowToJson(@NotNull List<String> columnNames, Row row) {
         JsonObject jsonObject = new JsonObject();
 
@@ -91,10 +141,10 @@ public class DataServiceVerticle extends AbstractVerticle {
 
             if (row.getValue(columnName) instanceof LocalDateTime) {
                 jsonObject.put(columnName,
-                        ((LocalDateTime) row.getValue(columnName)).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+                        ((LocalDateTime) row.getValue(columnName)).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             } else if (row.getValue(columnName) instanceof LocalDate) {
                 jsonObject.put(columnName,
-                        ((LocalDate) row.getValue(columnName)).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+                        ((LocalDate) row.getValue(columnName)).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             } else {
                 jsonObject.put(columnName, row.getValue(columnName));
             }
