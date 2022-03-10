@@ -37,7 +37,7 @@ public class Handlers {
         return context.response().setStatusCode(200).setStatusMessage("OK")
                 .putHeader("content-type", "application/json")
                 .putHeader("Access-Control-Allow-Origin", "*")
-                .putHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+                .putHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT")
                 .putHeader("Access-Control-Allow-Credentials", "true");
     }
 

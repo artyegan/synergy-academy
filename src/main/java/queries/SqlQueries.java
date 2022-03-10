@@ -33,6 +33,10 @@ public class SqlQueries {
 
         for (int i = 0; i < metadata.size(); ++i) {
             String currentColumn = metadata.getJsonObject(i).getString("column_name");
+
+            if (!data.containsKey(currentColumn)) {
+                continue;
+            }
 //todo
             if (metadata.getJsonObject(i).getBoolean("isclassiferid")) {
                 classifiers.add(currentColumn);

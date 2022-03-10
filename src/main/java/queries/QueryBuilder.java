@@ -92,7 +92,7 @@ public class QueryBuilder {
         }
     }
 
-    public <T> QueryBuilder addFilterSetColumn(String table, String column1, String column2) {
+    public QueryBuilder addFilterSetColumn(String table, String column1, String column2) {
         if (!this.currentQuery.toString().contains("set")) {
             this.append(" set ");
         } else {
