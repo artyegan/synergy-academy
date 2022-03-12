@@ -13,14 +13,18 @@ public class QueryBuilder {
         return this;
     }
 
-    public QueryBuilder addColumn(String table, String column, boolean addComma) {
-        this.addTable(table).append(".\"").append(column).append("\"");
-
-        if (addComma) {
-            return this.append(", ");
+    public <T> QueryBuilder appendData(T data) {
+        if (data instanceof String) {
+            this.appendString((String) data);
         } else {
-            return this.append(" ");
+            this.append(data);
         }
+
+        return this;
+    }
+
+    public QueryBuilder addColumn(String table, String column) {
+        return this.addTable(table).append(".\"").append(column).append("\"").append(" ");
     }
 
     public QueryBuilder addTable(String table) {
@@ -44,34 +48,32 @@ public class QueryBuilder {
             this.append("where ");
         }
 
-        if (value instanceof String) {
-            return this.addColumn(table, column, false).append("= ").appendString((String) value).append(" ");
+        return this.addColumn(table, column).append("= ").appendData(value).append(" ");
+    }
+
+    public QueryBuilder addFilterWhereTable(String table1, String column1, String table2, String column2) {
+        if (currentQuery.toString().contains("where")) {
+            this.append("and ");
         } else {
-            return this.addColumn(table, column, false).append("= ").append(value).append(" ");
+            this.append("where ");
         }
+
+        return this.addColumn(table1, column1).append("= ").addColumn(table2, column2);
     }
 
     public QueryBuilder addInnerJoin(String table1, String table2, String column1, String column2) {
         return this.append("inner join ").addTable(table2).append(" ")
-                .append("on ").addColumn(table1, column1, false).append("= ").addColumn(table2, column2, false);
+                .append("on ").addColumn(table1, column1).append("= ").addColumn(table2, column2);
     }
 
     public <T> QueryBuilder addFromFunction(String functionName, T... params) {
         this.addFromTable(functionName).append("(");
 
         for (int i = 0; i < params.length - 1; ++i) {
-            if (params[i] instanceof String) {
-                this.appendString((String) params[i]).append(", ");
-            } else {
-                this.append(params[i]).append(", ");
-            }
+            this.appendData(params[i]).append(", ");
         }
 
-        if (params[params.length - 1] instanceof String) {
-            return this.appendString((String) params[params.length - 1]).append(") ");
-        } else {
-            return this.append(params[params.length - 1]).append(") ");
-        }
+        return this.appendData(params[params.length - 1]).append(") ");
     }
 
     public QueryBuilder all() {
@@ -85,11 +87,7 @@ public class QueryBuilder {
             this.append(", ");
         }
 
-        if (value instanceof String) {
-            return this.append(column).append(" = ").appendString((String) value).append(" ");
-        } else {
-            return this.append(column).append(" = ").append(value).append(" ");
-        }
+        return this.append(column).append(" = ").appendData(value).append(" ");
     }
 
     public QueryBuilder addFilterSetColumn(String table, String column1, String column2) {
@@ -98,11 +96,23 @@ public class QueryBuilder {
         } else {
             this.append(", ");
         }
-        return this.append(column1).append(" = ").addColumn(table, column2, false).append(" ");
+        return this.append(column1).append(" = ").addColumn(table, column2).append(" ");
     }
 
     public QueryBuilder appendString(String string) {
         return this.append("'").append(string).append("'");
+    }
+
+    public QueryBuilder openBrace() {
+        return this.append("(");
+    }
+
+    public QueryBuilder closeBrace() {
+        return this.append(")");
+    }
+
+    public QueryBuilder appendComma() {
+        return this.append(", ");
     }
 
     public String getQuery() {

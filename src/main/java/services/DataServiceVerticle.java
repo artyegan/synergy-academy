@@ -35,6 +35,7 @@ public class DataServiceVerticle extends AbstractVerticle {
         vertx.eventBus().consumer("get.id.service", this::getIdHandler);
         vertx.eventBus().consumer("update.id.service", this::updateIdHandler);
         vertx.eventBus().consumer("get.metadata.service", this::getMetadataHandler);
+        vertx.eventBus().consumer("add.service", this::addHandler);
     }
 
     private void getAllHandler(Message<JsonArray> msg) {
@@ -127,6 +128,22 @@ public class DataServiceVerticle extends AbstractVerticle {
                             msg.reply(new JsonObject().put("msg", msg.body().getString("keyword") + " " +
                                     msg.body().getString("id") +
                                     " updated"));
+                        }, error -> {
+                            LOGGER.error(error);
+                            msg.fail(500, error.getMessage());
+                        }
+                );
+    }
+
+    private void addHandler(Message<JsonObject> msg) {
+        pgPool.preparedQuery(SqlQueries.insertQuery(
+                        msg.body().getJsonArray("metadata"),
+                        msg.body().getString("keyword"),
+                        msg.body().getJsonObject("data")))
+                .rxExecute()
+                .subscribe(res -> {
+                            LOGGER.info("Data inserted in " + msg.body().getString("keyword"));
+                            msg.reply(new JsonObject().put("msg", "Data inserted in " + msg.body().getString("keyword")));
                         }, error -> {
                             LOGGER.error(error);
                             msg.fail(500, error.getMessage());

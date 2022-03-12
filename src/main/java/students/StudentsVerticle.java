@@ -24,6 +24,7 @@ public class StudentsVerticle extends AbstractVerticle {
     @Override
     public void start() {
         vertx.eventBus().consumer("get.students.all", this::getAllStudents);
+        vertx.eventBus().consumer("add.student", this::addStudent);
         vertx.eventBus().consumer("get.students.id", this::getStudentById);
         vertx.eventBus().consumer("update.students.id", this::updateStudentById);
 
@@ -31,6 +32,20 @@ public class StudentsVerticle extends AbstractVerticle {
 
     private void getAllStudents(Message<JsonArray> msg) {
         getAllStudentsRequest()
+                .subscribe(
+                        msg::reply,
+                        error -> {
+                            LOGGER.error(error);
+                            msg.fail(500, error.getMessage());
+                        });
+    }
+
+    private void addStudent(Message<JsonObject> msg) {
+        getStudentMetadataAndExtractId()
+                .map(metadata ->
+                        msg.body().put("metadata", metadata)
+                                .put("keyword", studentsDB))
+                .flatMap(this::addStudentRequest)
                 .subscribe(
                         msg::reply,
                         error -> {
@@ -50,12 +65,7 @@ public class StudentsVerticle extends AbstractVerticle {
     }
 
     private void updateStudentById(Message<JsonObject> msg) {
-        getStudentMetadata()
-                .flatMapObservable(Observable::fromIterable)
-                .map(obj -> (JsonObject) obj)
-                .filter(json -> !json.getString("column_name").equals("studentid"))
-                .toList()
-                .map(JsonArray::new)
+        getStudentMetadataAndExtractId()
                 .map(metadata ->
                         msg.body().put("metadata", metadata)
                                 .put("keyword", studentsDB))
@@ -89,11 +99,25 @@ public class StudentsVerticle extends AbstractVerticle {
                 .map(Message::body);
     }
 
+    private Single<JsonObject> addStudentRequest(JsonObject msgBody) {
+        return vertx.eventBus().<JsonObject>rxRequest("add.service", msgBody)
+                .map(Message::body);
+    }
+
     private Single<JsonArray> getStudentMetadata() {
         return vertx.eventBus().<JsonArray>rxRequest("get.metadata.service",
                         new JsonArray().add(new JsonObject()
                                 .put("function", "getcolumnbytablenamewithclassiferbool")
                                 .put("keyword", studentsDB)))
                 .map(Message::body);
+    }
+
+    private Single<JsonArray> getStudentMetadataAndExtractId() {
+        return getStudentMetadata()
+                .flatMapObservable(Observable::fromIterable)
+                .map(obj -> (JsonObject) obj)
+                .filter(json -> !json.getString("column_name").equals("studentid"))
+                .toList()
+                .map(JsonArray::new);
     }
 }

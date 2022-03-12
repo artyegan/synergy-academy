@@ -25,6 +25,7 @@ public class Handlers {
         handlers = new ArrayList<>();
 
         handlers.add(Pair.with("getAllStudents", this::getAllStudents));
+        handlers.add(Pair.with("addStudent", this::addStudent));
         handlers.add(Pair.with("getStudentById", this::getStudentById));
         handlers.add(Pair.with("updateStudentById", this::updateStudentById));
         handlers.add(Pair.with("getAllCourses", this::getAllCourses));
@@ -44,6 +45,16 @@ public class Handlers {
     private void getAllStudents(RoutingContext context) {
         vertx.eventBus()
                 .<JsonArray>rxRequest("get.students.all", "")
+                .subscribe(
+                        result -> addResponseHeaders(context).end(result.body().encodePrettily()),
+                        error -> context.response().setStatusCode(500).end(error.getMessage())
+                );
+    }
+
+    private void addStudent(RoutingContext context) {
+        vertx.eventBus()
+                .<JsonObject>rxRequest("add.student",
+                        new JsonObject().put("data", context.getBodyAsJson()))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())

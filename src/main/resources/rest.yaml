@@ -12,6 +12,13 @@ paths:
           description: OK
         500:
           description: error while getting all students
+    post:
+      operationId: addStudent
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while adding new student
   /students/{studentId}:
     get:
       operationId: getStudentById
