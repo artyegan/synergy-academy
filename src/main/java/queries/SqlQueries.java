@@ -129,8 +129,8 @@ public class SqlQueries {
             String currentColumn = metadata.getJsonObject(i).getString("column_name");
 
             if (metadata.getJsonObject(i).getBoolean("isclassiferid")) {
-                classifiers.add(currentColumn);
-                queryBuilder.addColumn(modifyClassifierTable(currentColumn), currentColumn);
+                classifiers.add(currentColumn); //todo
+                queryBuilder.addColumn(modifyClassifierTable(currentColumn), "name").append("as ").append(currentColumn);
             } else {
                 queryBuilder.addColumn(tableName, currentColumn);
             }
@@ -139,6 +139,8 @@ public class SqlQueries {
                 queryBuilder.appendComma();
             }
         }
+
+        queryBuilder.addFromTable(tableName);
 
         for (String classifier : classifiers) {
             queryBuilder.addFromTable(modifyClassifierTable(classifier));
@@ -154,16 +156,4 @@ public class SqlQueries {
     private static String modifyClassifierTable(String classifierColumn) {
         return "c_" + classifierColumn.substring(0, classifierColumn.length() - 2);
     }
-
-//    insert into student(firstname,lastname,email,fullname,phonenumber,
-//                        address,universityid,gpa,whatprogramminglanguagesdoyouknow,
-//                        educationdepartmentadmissionandgraduationyear,othercoursesattended,
-//                        haveyoueverparticipatedinprogramming,doyouhaveworkexperience,howdidyoufindid,birthday)
-//    select 'myname', 'yourname', 'myemail', 'myfull', 'myphonenumber', 'myaddress', public.c_university."universityid",
-//            4, 'mywhatprogramminglanguagesdoyouknow', 'myeducationdepartmentadmissionandgraduationyear',
-//            'myothercoursesattended', 'myhaveyoueverparticipatedinprogramming', 'mydoyouhaveworkexperience',
-//    c_howdidyoufind.howdidyoufindid, '2022-12-12'
-//    from c_university, c_howdidyoufind
-//    where c_university."name" = 'Yerevan State University (1919)'
-//    and c_howdidyoufind."name" = 'Instagram'
 }

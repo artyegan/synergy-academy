@@ -44,7 +44,7 @@ public class Handlers {
 
     private void getAllStudents(RoutingContext context) {
         vertx.eventBus()
-                .<JsonArray>rxRequest("get.students.all", "")
+                .<JsonArray>rxRequest("get.students.all", new JsonArray())
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())

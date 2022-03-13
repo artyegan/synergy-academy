@@ -31,7 +31,15 @@ public class StudentsVerticle extends AbstractVerticle {
     }
 
     private void getAllStudents(Message<JsonArray> msg) {
-        getAllStudentsRequest()
+        getStudentMetadataAndExtractId()
+                .map(metadata ->
+                    new JsonArray().add(
+                            new JsonObject()
+                                    .put("metadata", metadata)
+                                    .put("keyword", studentsDB)
+                    )
+                )
+                .flatMap(this::getAllStudentsRequest)
                 .subscribe(
                         msg::reply,
                         error -> {
@@ -78,11 +86,8 @@ public class StudentsVerticle extends AbstractVerticle {
                         });
     }
 
-    private Single<JsonArray> getAllStudentsRequest() {
-        return vertx.eventBus().<JsonArray>rxRequest("get.all.service",
-                        new JsonArray()
-                                .add(new JsonObject()
-                                        .put("keyword", studentsDB)))
+    private Single<JsonArray> getAllStudentsRequest(JsonArray msgBody) {
+        return vertx.eventBus().<JsonArray>rxRequest("get.all.service", msgBody)
                 .map(Message::body);
     }
 
