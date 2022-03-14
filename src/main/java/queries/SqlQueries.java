@@ -99,7 +99,11 @@ public class SqlQueries {
                 classifiers.add(currentColumn);
                 queryBuilder.addColumn(modifyClassifierTable(currentColumn), currentColumn);
             } else {
-                queryBuilder.appendData(data.getValue(currentColumn));
+                if (metadata.getJsonObject(i).getString("data_type").equals("date")) {
+                    queryBuilder.appendData(data.getValue(currentColumn)).append("::date");
+                } else {
+                    queryBuilder.appendData(data.getValue(currentColumn));
+                }
             }
 
             if (i < metadata.size() - 1) {
