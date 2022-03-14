@@ -61,8 +61,13 @@ public class QueryBuilder {
         return this.addColumn(table1, column1).append("= ").addColumn(table2, column2);
     }
 
-    public QueryBuilder addInnerJoin(String table1, String table2, String column1, String column2) {
-        return this.append("inner join ").addTable(table2).append(" ")
+    public <T> QueryBuilder addLeftJoin(String table, String column, T data) {
+        return this.append("left join ").addTable(table).append(" ")
+                .append("on ").addColumn(table, column).append("= ").appendData(data);
+    }
+
+    public QueryBuilder addLeftJoinColumn(String table1, String table2, String column1, String column2) {
+        return this.append("left join ").addTable(table2).append(" ")
                 .append("on ").addColumn(table1, column1).append("= ").addColumn(table2, column2);
     }
 

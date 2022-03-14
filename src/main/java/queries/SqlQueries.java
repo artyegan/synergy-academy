@@ -86,7 +86,7 @@ public class SqlQueries {
     public static String selectQuery(JsonArray metadata, String tableName, JsonObject data) {
         List<String> classifiers = new ArrayList<>();
 
-        QueryBuilder queryBuilder = new QueryBuilder("select");
+        QueryBuilder queryBuilder = new QueryBuilder("select distinct");
 
         for (int i = 0; i < metadata.size(); ++i) {
             String currentColumn = metadata.getJsonObject(i).getString("column_name");
@@ -107,13 +107,10 @@ public class SqlQueries {
             }
         }
 
-        for (String classifier : classifiers) {
-            queryBuilder.addFromTable(modifyClassifierTable(classifier));
-        }
+        queryBuilder.addFromTable(tableName);
 
         for (String classifier : classifiers) {
-            queryBuilder.addFilterWhere(modifyClassifierTable(classifier),
-                    "name", data.getValue(classifier));
+            queryBuilder.addLeftJoin(modifyClassifierTable(classifier), "name", data.getValue(classifier));
         }
 
         return queryBuilder.getQuery();
