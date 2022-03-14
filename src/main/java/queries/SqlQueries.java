@@ -144,13 +144,8 @@ public class SqlQueries {
         queryBuilder.addFromTable(tableName);
 
         for (String classifier : classifiers) {
-            queryBuilder.addFromTable(modifyClassifierTable(classifier));
+            queryBuilder.addLeftJoinColumn(tableName, modifyClassifierTable(classifier), classifier, classifier);
         }
-
-        for (String classifier : classifiers) {
-            queryBuilder.addFilterWhereTable(tableName, classifier, modifyClassifierTable(classifier), classifier);
-        }
-
         return queryBuilder.getQuery();
     }
 
