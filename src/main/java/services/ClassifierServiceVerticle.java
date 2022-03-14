@@ -18,7 +18,17 @@ public class ClassifierServiceVerticle extends AbstractVerticle {
     }
 
     private void getClassifier(Message<JsonArray> msg) {
-        getClassifierRequest(msg.body())
+        String classifierTableName = msg.body().getJsonObject(0).getString("keyword");
+
+        getClassifierMetadata(classifierTableName)
+                .map(metadata ->
+                        new JsonArray().add(
+                                new JsonObject()
+                                        .put("metadata", metadata)
+                                        .put("keyword", classifierTableName)
+                        )
+                )
+                .flatMap(this::getClassifierRequest)
                 .subscribe(msg::reply,
                         error -> {
                             LOGGER.error(error);
@@ -29,6 +39,14 @@ public class ClassifierServiceVerticle extends AbstractVerticle {
     private Single<JsonArray> getClassifierRequest(JsonArray classifierTableName) {
         return vertx.eventBus()
                 .<JsonArray>rxRequest("get.all.service", classifierTableName)
+                .map(Message::body);
+    }
+
+    private Single<JsonArray> getClassifierMetadata(String classifierTableName) {
+        return vertx.eventBus().<JsonArray>rxRequest("get.metadata.service",
+                        new JsonArray().add(new JsonObject()
+                                .put("function", "getcolumnbytablenamewithclassiferbool")
+                                .put("keyword", classifierTableName)))
                 .map(Message::body);
     }
 }

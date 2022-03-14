@@ -31,7 +31,7 @@ public class StudentsVerticle extends AbstractVerticle {
     }
 
     private void getAllStudents(Message<JsonArray> msg) {
-        getStudentMetadataAndExtractId()
+        getStudentMetadata()
                 .map(metadata ->
                     new JsonArray().add(
                             new JsonObject()
