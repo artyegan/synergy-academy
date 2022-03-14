@@ -11,6 +11,9 @@ import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 
+import static services.MetadataProvider.getMetadata;
+import static services.MetadataProvider.getMetadataAndExtractId;
+
 public class StudentsVerticle extends AbstractVerticle {
 
     private static final Logger LOGGER = LogManager.getLogger(StudentsVerticle.class);
@@ -31,7 +34,7 @@ public class StudentsVerticle extends AbstractVerticle {
     }
 
     private void getAllStudents(Message<JsonArray> msg) {
-        getStudentMetadata()
+        getMetadata(studentsDB, vertx)
                 .map(metadata ->
                     new JsonArray().add(
                             new JsonObject()
@@ -49,7 +52,7 @@ public class StudentsVerticle extends AbstractVerticle {
     }
 
     private void addStudent(Message<JsonObject> msg) {
-        getStudentMetadataAndExtractId()
+        getMetadataAndExtractId(studentsDB, vertx)
                 .map(metadata ->
                         msg.body().put("metadata", metadata)
                                 .put("keyword", studentsDB))
@@ -73,7 +76,7 @@ public class StudentsVerticle extends AbstractVerticle {
     }
 
     private void updateStudentById(Message<JsonObject> msg) {
-        getStudentMetadataAndExtractId()
+        getMetadataAndExtractId(studentsDB, vertx)
                 .map(metadata ->
                         msg.body().put("metadata", metadata)
                                 .put("keyword", studentsDB))
@@ -107,22 +110,5 @@ public class StudentsVerticle extends AbstractVerticle {
     private Single<JsonObject> addStudentRequest(JsonObject msgBody) {
         return vertx.eventBus().<JsonObject>rxRequest("add.service", msgBody)
                 .map(Message::body);
-    }
-
-    private Single<JsonArray> getStudentMetadata() {
-        return vertx.eventBus().<JsonArray>rxRequest("get.metadata.service",
-                        new JsonArray().add(new JsonObject()
-                                .put("function", "getcolumnbytablenamewithclassiferbool")
-                                .put("keyword", studentsDB)))
-                .map(Message::body);
-    }
-
-    private Single<JsonArray> getStudentMetadataAndExtractId() {
-        return getStudentMetadata()
-                .flatMapObservable(Observable::fromIterable)
-                .map(obj -> (JsonObject) obj)
-                .filter(json -> !json.getString("column_name").equals("studentid"))
-                .toList()
-                .map(JsonArray::new);
     }
 }

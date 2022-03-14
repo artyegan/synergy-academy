@@ -8,6 +8,8 @@ import io.vertx.reactivex.core.eventbus.Message;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import static services.MetadataProvider.getMetadata;
+
 public class ClassifierServiceVerticle extends AbstractVerticle {
 
     private static final Logger LOGGER = LogManager.getLogger(ClassifierServiceVerticle.class);
@@ -20,7 +22,7 @@ public class ClassifierServiceVerticle extends AbstractVerticle {
     private void getClassifier(Message<JsonArray> msg) {
         String classifierTableName = msg.body().getJsonObject(0).getString("keyword");
 
-        getClassifierMetadata(classifierTableName)
+        getMetadata(classifierTableName, vertx)
                 .map(metadata ->
                         new JsonArray().add(
                                 new JsonObject()
@@ -39,14 +41,6 @@ public class ClassifierServiceVerticle extends AbstractVerticle {
     private Single<JsonArray> getClassifierRequest(JsonArray classifierTableName) {
         return vertx.eventBus()
                 .<JsonArray>rxRequest("get.all.service", classifierTableName)
-                .map(Message::body);
-    }
-
-    private Single<JsonArray> getClassifierMetadata(String classifierTableName) {
-        return vertx.eventBus().<JsonArray>rxRequest("get.metadata.service",
-                        new JsonArray().add(new JsonObject()
-                                .put("function", "getcolumnbytablenamewithclassiferbool")
-                                .put("keyword", classifierTableName)))
                 .map(Message::body);
     }
 }
