@@ -150,10 +150,19 @@ public class SqlQueries {
         for (String classifier : classifiers) {
             queryBuilder.addLeftJoinColumn(tableName, modifyClassifierTable(classifier), classifier, classifier);
         }
+
+        handleClassifier(queryBuilder, tableName);
+
         return queryBuilder.getQuery();
     }
 
     private static String modifyClassifierTable(String classifierColumn) {
         return "c_" + classifierColumn.substring(0, classifierColumn.length() - 2);
+    }
+
+    private static void handleClassifier(QueryBuilder queryBuilder, String tableName) {
+        if (tableName.startsWith("c_")) {
+            queryBuilder.append("order by ").addColumn(tableName, "name");
+        }
     }
 }
