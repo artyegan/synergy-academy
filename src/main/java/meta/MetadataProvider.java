@@ -1,4 +1,4 @@
-package services;
+package meta;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;

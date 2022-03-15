@@ -1,6 +1,5 @@
 package students;
 
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -11,8 +10,8 @@ import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 
-import static services.MetadataProvider.getMetadata;
-import static services.MetadataProvider.getMetadataAndExtractId;
+import static meta.MetadataProvider.getMetadata;
+import static meta.MetadataProvider.getMetadataAndExtractId;
 
 public class StudentsVerticle extends AbstractVerticle {
 
@@ -69,10 +68,7 @@ public class StudentsVerticle extends AbstractVerticle {
         getMetadata(studentsDB, vertx)
                 .map(metadata ->
                         msg.body().put("metadata", metadata)
-                                .put("keyword", studentsDB)
-                                .put("filterColumn", msg.body().getString("filterColumn"))
-                                .put("value", msg.body().getString("studentId"))
-                )
+                                .put("keyword", studentsDB))
                 .flatMap(this::getStudentByIdRequest)
                 .subscribe(
                         msg::reply,
@@ -102,7 +98,7 @@ public class StudentsVerticle extends AbstractVerticle {
     }
 
     private Single<JsonObject> getStudentByIdRequest(JsonObject msgBody) {
-        return vertx.eventBus().<JsonObject>rxRequest("get.id.service", msgBody)
+        return vertx.eventBus().<JsonObject>rxRequest("get.filter.service", msgBody)
                 .map(Message::body);
     }
 

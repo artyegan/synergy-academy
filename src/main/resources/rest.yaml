@@ -68,3 +68,17 @@ paths:
           description: OK
         500:
           description: error while getting classifier
+  /config/{type}:
+    get:
+      operationId: getConfig
+      parameters:
+        - in: path
+          name: type
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while getting config

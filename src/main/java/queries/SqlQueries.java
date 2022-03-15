@@ -13,10 +13,6 @@ public class SqlQueries {
                 .addFromTable(tableName);
     }
 
-    public static String getIdQuery(String tableName, String id) {
-        return "select * from public.getstudentbyid(" + id + ")";
-    }
-
     public static QueryBuilder getFunctionQuery(String function, String... params) {
         return new QueryBuilder("select")
                 .all()

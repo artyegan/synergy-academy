@@ -8,7 +8,7 @@ import io.vertx.reactivex.core.eventbus.Message;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static services.MetadataProvider.getMetadata;
+import static meta.MetadataProvider.getMetadata;
 
 public class ClassifierServiceVerticle extends AbstractVerticle {
 

@@ -32,7 +32,7 @@ public class DataServiceVerticle extends AbstractVerticle {
     @Override
     public void start() {
         vertx.eventBus().consumer("get.all.service", this::getAllHandler);
-        vertx.eventBus().consumer("get.id.service", this::getFilterHandler);
+        vertx.eventBus().consumer("get.filter.service", this::getFilterHandler);
         vertx.eventBus().consumer("update.id.service", this::updateIdHandler);
         vertx.eventBus().consumer("get.metadata.service", this::getMetadataHandler);
         vertx.eventBus().consumer("add.service", this::addHandler);

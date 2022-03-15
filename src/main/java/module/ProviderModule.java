@@ -12,6 +12,7 @@ import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.pgclient.PgPool;
 import io.vertx.sqlclient.PoolOptions;
+import meta.ConfigProviderVerticle;
 import server.Handlers;
 import server.RouterBuilderVerticle;
 import server.VerticleDeployer;
@@ -117,5 +118,11 @@ public class ProviderModule extends AbstractModule {
     @ProvidesIntoSet
     public Verticle provideClassifierServiceVerticle() {
         return new ClassifierServiceVerticle();
+    }
+
+    @Inject
+    @ProvidesIntoSet
+    public Verticle provideConfigProviderVerticle(@Named("configDB") String configDB) {
+        return new ConfigProviderVerticle(configDB);
     }
 }

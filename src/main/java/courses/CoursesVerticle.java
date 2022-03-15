@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 
-import static services.MetadataProvider.getMetadata;
+import static meta.MetadataProvider.getMetadata;
 
 public class CoursesVerticle extends AbstractVerticle {
 
