@@ -10,6 +10,8 @@ import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 
+import static services.MetadataProvider.getMetadata;
+
 public class CoursesVerticle extends AbstractVerticle {
 
     private static final Logger LOGGER = LogManager.getLogger(CoursesVerticle.class);
@@ -26,19 +28,25 @@ public class CoursesVerticle extends AbstractVerticle {
     }
 
     private void getAllCourses(Message<JsonArray> msg) {
-        getAllCoursesRequest()
-                .subscribe(msg::reply,
+        getMetadata(coursesDB, vertx)
+                .map(metadata ->
+                        new JsonArray().add(
+                                new JsonObject()
+                                        .put("metadata", metadata)
+                                        .put("keyword", coursesDB)
+                        )
+                )
+                .flatMap(this::getAllCoursesRequest)
+                .subscribe(
+                        msg::reply,
                         error -> {
                             LOGGER.error(error);
                             msg.fail(500, error.getMessage());
                         });
     }
 
-    private Single<JsonArray> getAllCoursesRequest() {
-        return vertx.eventBus().<JsonArray>rxRequest("get.all.service",
-                        new JsonArray()
-                                .add(new JsonObject()
-                                        .put("keyword", coursesDB)))
+    private Single<JsonArray> getAllCoursesRequest(JsonArray msgBody) {
+        return vertx.eventBus().<JsonArray>rxRequest("get.all.service", msgBody)
                 .map(Message::body);
     }
 }
