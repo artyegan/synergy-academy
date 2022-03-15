@@ -7,25 +7,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SqlQueries {
-    public static String getAllQuery(String tableName) {
+    public static QueryBuilder getAllQuery(String tableName) {
         return new QueryBuilder("select")
                 .all()
-                .addFromTable(tableName)
-                .getQuery();
+                .addFromTable(tableName);
     }
 
     public static String getIdQuery(String tableName, String id) {
         return "select * from public.getstudentbyid(" + id + ")";
     }
 
-    public static String getFunctionQuery(String function, String... params) {
+    public static QueryBuilder getFunctionQuery(String function, String... params) {
         return new QueryBuilder("select")
                 .all()
-                .addFromFunction(function, params)
-                .getQuery();
+                .addFromFunction(function, params);
     }
 
-    public static String updateQuery(JsonArray metadata, String id, String tableName, JsonObject data) {
+    public static QueryBuilder updateQuery(JsonArray metadata, String id, String tableName, JsonObject data) {
         List<String> classifiers = new ArrayList<>();
 
         QueryBuilder queryBuilder = new QueryBuilder("update")
@@ -56,10 +54,10 @@ public class SqlQueries {
                     "name", data.getValue(classifier));
         }
 
-        return queryBuilder.addFilterWhere(tableName, tableName + "id", id).getQuery();
+        return queryBuilder.addFilterWhere(tableName, tableName + "id", id);
     }
 
-    public static String insertQuery(JsonArray metadata, String tableName, JsonObject data) {
+    public static QueryBuilder insertQuery(JsonArray metadata, String tableName, JsonObject data) {
         QueryBuilder queryBuilder = new QueryBuilder("insert into")
                 .addTable(tableName)
                 .openBrace();
@@ -80,10 +78,10 @@ public class SqlQueries {
             }
         }
 
-        return queryBuilder.append(selectQuery(metadata, tableName, data)).getQuery();
+        return queryBuilder.append(selectQuery(metadata, tableName, data).getQuery());
     }
 
-    public static String selectQuery(JsonArray metadata, String tableName, JsonObject data) {
+    public static QueryBuilder selectQuery(JsonArray metadata, String tableName, JsonObject data) {
         List<String> classifiers = new ArrayList<>();
 
         QueryBuilder queryBuilder = new QueryBuilder("select distinct");
@@ -121,11 +119,11 @@ public class SqlQueries {
             queryBuilder.addLeftJoin(modifyClassifierTable(classifier), "name", data.getValue(classifier));
         }
 
-        return queryBuilder.getQuery();
+        return queryBuilder;
     }
 
 
-    public static String selectQuery(JsonArray metadata, String tableName) {
+    public static QueryBuilder selectQuery(JsonArray metadata, String tableName) {
         List<String> classifiers = new ArrayList<>();
 
         QueryBuilder queryBuilder = new QueryBuilder("select");
@@ -153,7 +151,14 @@ public class SqlQueries {
 
         handleClassifier(queryBuilder, tableName);
 
-        return queryBuilder.getQuery();
+        return queryBuilder;
+    }
+
+    public static QueryBuilder selectQueryFilter(JsonArray metadata, String tableName, String filterColumn, String value) {
+        QueryBuilder queryBuilder = selectQuery(metadata, tableName);
+        queryBuilder.addFilterWhere(tableName, filterColumn, value);
+
+        return queryBuilder;
     }
 
     private static String modifyClassifierTable(String classifierColumn) {

@@ -63,7 +63,9 @@ public class Handlers {
 
     private void getStudentById(RoutingContext context) {
         vertx.eventBus()
-                .<JsonObject>rxRequest("get.students.id", new JsonObject().put("studentId", context.pathParam("studentId")))
+                .<JsonObject>rxRequest("get.students.id", new JsonObject()
+                        .put("studentId", context.pathParam("studentId"))
+                        .put("filterColumn", "studentid"))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())

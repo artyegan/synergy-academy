@@ -32,7 +32,7 @@ public class DataServiceVerticle extends AbstractVerticle {
     @Override
     public void start() {
         vertx.eventBus().consumer("get.all.service", this::getAllHandler);
-        vertx.eventBus().consumer("get.id.service", this::getIdHandler);
+        vertx.eventBus().consumer("get.id.service", this::getFilterHandler);
         vertx.eventBus().consumer("update.id.service", this::updateIdHandler);
         vertx.eventBus().consumer("get.metadata.service", this::getMetadataHandler);
         vertx.eventBus().consumer("add.service", this::addHandler);
@@ -44,7 +44,7 @@ public class DataServiceVerticle extends AbstractVerticle {
         String keyword = msg.body().getJsonObject(0).getString("keyword");
         JsonArray metadata = msg.body().getJsonObject(0).getJsonArray("metadata");
 
-        pgPool.preparedQuery(SqlQueries.selectQuery(metadata, keyword))
+        pgPool.preparedQuery(SqlQueries.selectQuery(metadata, keyword).getQuery())
                 .rxExecute()
                 .map(rowSet -> {
                     columnNames.addAll(rowSet.columnsNames());
@@ -62,11 +62,15 @@ public class DataServiceVerticle extends AbstractVerticle {
                 });
     }
 
-    private void getIdHandler(Message<JsonObject> msg) {
-        String keyword = msg.body().getString("keyword");
-        String id = msg.body().getString("id");
+    private void getFilterHandler(Message<JsonObject> msg) {
+        JsonObject msgBody = msg.body();
 
-        pgPool.preparedQuery(SqlQueries.getIdQuery(keyword, id))
+        JsonArray metadata = msgBody.getJsonArray("metadata");
+        String keyword = msgBody.getString("keyword");
+        String filterColumn = msgBody.getString("filterColumn");
+        String value = msg.body().getString("value");
+
+        pgPool.preparedQuery(SqlQueries.selectQueryFilter(metadata, keyword, filterColumn, value).getQuery())
                 .rxExecute()
                 .map(rowSet -> {
                     JsonObject jsonObject = new JsonObject();
@@ -78,7 +82,7 @@ public class DataServiceVerticle extends AbstractVerticle {
                     return jsonObject;
                 })
                 .subscribe(json -> {
-                            LOGGER.info("Got " + keyword + " by id");
+                            LOGGER.info("Got " + keyword + " by " + filterColumn);
                             msg.reply(json);
                         },
                         error -> {
@@ -96,7 +100,7 @@ public class DataServiceVerticle extends AbstractVerticle {
                 .getJsonObject(0)
                 .getString("function");
         ;
-        pgPool.preparedQuery(SqlQueries.getFunctionQuery(function, keyword))
+        pgPool.preparedQuery(SqlQueries.getFunctionQuery(function, keyword).getQuery())
                 .rxExecute()
                 .map(rowSet -> {
                     columnNames.addAll(rowSet.columnsNames());
@@ -119,7 +123,7 @@ public class DataServiceVerticle extends AbstractVerticle {
                         msg.body().getJsonArray("metadata"),
                         msg.body().getString("id"),
                         msg.body().getString("keyword"),
-                        msg.body().getJsonObject("data")))
+                        msg.body().getJsonObject("data")).getQuery())
                 .rxExecute()
                 .subscribe(res -> {
                             LOGGER.info(msg.body().getString("keyword") + " " +
@@ -139,7 +143,7 @@ public class DataServiceVerticle extends AbstractVerticle {
         pgPool.preparedQuery(SqlQueries.insertQuery(
                         msg.body().getJsonArray("metadata"),
                         msg.body().getString("keyword"),
-                        msg.body().getJsonObject("data")))
+                        msg.body().getJsonObject("data")).getQuery())
                 .rxExecute()
                 .subscribe(res -> {
                             LOGGER.info("Data inserted in " + msg.body().getString("keyword"));

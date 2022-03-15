@@ -28,7 +28,7 @@ public class StudentsVerticle extends AbstractVerticle {
     public void start() {
         vertx.eventBus().consumer("get.students.all", this::getAllStudents);
         vertx.eventBus().consumer("add.student", this::addStudent);
-        vertx.eventBus().consumer("get.students.id", this::getStudentById);
+        vertx.eventBus().consumer("get.students.id", this::getStudentByFilter);
         vertx.eventBus().consumer("update.students.id", this::updateStudentById);
 
     }
@@ -65,8 +65,15 @@ public class StudentsVerticle extends AbstractVerticle {
                         });
     }
 
-    private void getStudentById(Message<JsonObject> msg) {
-        getStudentByIdRequest(msg.body().getString("studentId"))
+    private void getStudentByFilter(Message<JsonObject> msg) {
+        getMetadata(studentsDB, vertx)
+                .map(metadata ->
+                        msg.body().put("metadata", metadata)
+                                .put("keyword", studentsDB)
+                                .put("filterColumn", msg.body().getString("filterColumn"))
+                                .put("value", msg.body().getString("studentId"))
+                )
+                .flatMap(this::getStudentByIdRequest)
                 .subscribe(
                         msg::reply,
                         error -> {
@@ -94,11 +101,8 @@ public class StudentsVerticle extends AbstractVerticle {
                 .map(Message::body);
     }
 
-    private Single<JsonObject> getStudentByIdRequest(String id) {
-        return vertx.eventBus().<JsonObject>rxRequest("get.id.service",
-                        new JsonObject()
-                                .put("keyword", studentsDB)
-                                .put("id", id))
+    private Single<JsonObject> getStudentByIdRequest(JsonObject msgBody) {
+        return vertx.eventBus().<JsonObject>rxRequest("get.id.service", msgBody)
                 .map(Message::body);
     }
 
