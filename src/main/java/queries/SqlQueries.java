@@ -101,7 +101,11 @@ public class SqlQueries {
             } else {
                 if (metadata.getJsonObject(i).getString("data_type").equals("date")) {
                     queryBuilder.appendData(data.getValue(currentColumn)).append("::date");
-                } else {
+                }
+                else if (metadata.getJsonObject(i).getString("data_type").equals("numeric")) {
+                    queryBuilder.appendData(data.getValue(currentColumn)).append("::numeric");
+                }
+                else {
                     queryBuilder.appendData(data.getValue(currentColumn));
                 }
             }
