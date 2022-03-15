@@ -62,28 +62,28 @@ public class DataServiceVerticle extends AbstractVerticle {
                 });
     }
 
-    private void getFilterHandler(Message<JsonObject> msg) {
-        JsonObject msgBody = msg.body();
+    private void getFilterHandler(Message<JsonArray> msg) {
+        List<String> columnNames = new ArrayList<>();
+
+        JsonObject msgBody = msg.body().getJsonObject(0);
 
         JsonArray metadata = msgBody.getJsonArray("metadata");
         String keyword = msgBody.getString("keyword");
         String filterColumn = msgBody.getString("filterColumn");
-        String value = msg.body().getString("value");
+        String value = msgBody.getString("value");
 
         pgPool.preparedQuery(SqlQueries.selectQueryFilter(metadata, keyword, filterColumn, value).getQuery())
                 .rxExecute()
                 .map(rowSet -> {
-                    JsonObject jsonObject = new JsonObject();
-
-                    for (Row row : rowSet) {
-                        jsonObject = addRowToJson(rowSet.columnsNames(), row);
-                    }
-
-                    return jsonObject;
+                    columnNames.addAll(rowSet.columnsNames());
+                    return rowSet;
                 })
+                .flatMapObservable(Observable::fromIterable)
+                .map(row -> this.addRowToJson(columnNames, row))
+                .toList()
                 .subscribe(json -> {
                             LOGGER.info("Got " + keyword + " by " + filterColumn);
-                            msg.reply(json);
+                            msg.reply(new JsonArray(json));
                         },
                         error -> {
                             LOGGER.error(error);

@@ -2,6 +2,7 @@ package meta;
 
 import com.google.inject.Inject;
 import io.reactivex.Single;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.core.eventbus.Message;
@@ -22,14 +23,14 @@ public class ConfigProviderVerticle extends AbstractVerticle {
     }
 
     @Override
-    public void start() throws Exception {
+    public void start() {
         vertx.eventBus().consumer("get.config", this::getConfig);
     }
 
-    private void getConfig(Message<JsonObject> msg) {
+    private void getConfig(Message<JsonArray> msg) {
         getMetadata(configDB, vertx)
                 .map(metadata ->
-                        msg.body().put("metadata", metadata)
+                        msg.body().getJsonObject(0).put("metadata", metadata)
                                 .put("keyword", configDB))
                 .flatMap(this::getConfigRequest)
                 .subscribe(
@@ -40,8 +41,8 @@ public class ConfigProviderVerticle extends AbstractVerticle {
                         });
     }
 
-    private Single<JsonObject> getConfigRequest(JsonObject msgBody) {
-        return vertx.eventBus().<JsonObject>rxRequest("get.filter.service", msgBody)
+    private Single<JsonArray> getConfigRequest(JsonObject msgBody) {
+        return vertx.eventBus().<JsonArray>rxRequest("get.filter.service", new JsonArray().add(msgBody))
                 .map(Message::body);
     }
 }

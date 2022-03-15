@@ -64,10 +64,10 @@ public class StudentsVerticle extends AbstractVerticle {
                         });
     }
 
-    private void getStudentByFilter(Message<JsonObject> msg) {
+    private void getStudentByFilter(Message<JsonArray> msg) {
         getMetadata(studentsDB, vertx)
                 .map(metadata ->
-                        msg.body().put("metadata", metadata)
+                        msg.body().getJsonObject(0).put("metadata", metadata)
                                 .put("keyword", studentsDB))
                 .flatMap(this::getStudentByIdRequest)
                 .subscribe(
@@ -97,8 +97,8 @@ public class StudentsVerticle extends AbstractVerticle {
                 .map(Message::body);
     }
 
-    private Single<JsonObject> getStudentByIdRequest(JsonObject msgBody) {
-        return vertx.eventBus().<JsonObject>rxRequest("get.filter.service", msgBody)
+    private Single<JsonArray> getStudentByIdRequest(JsonObject msgBody) {
+        return vertx.eventBus().<JsonArray>rxRequest("get.filter.service", new JsonArray().add(msgBody))
                 .map(Message::body);
     }
 
