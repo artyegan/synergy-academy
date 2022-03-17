@@ -54,6 +54,20 @@ paths:
           description: OK
         500:
           description: error while getting all courses
+  /courses/{courseId}:
+    get:
+      operationId: getCourseById
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while getting course by id
   /classifierservice/{tableName}:
     get:
       operationId: getClassifier

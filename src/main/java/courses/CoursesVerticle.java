@@ -25,6 +25,7 @@ public class CoursesVerticle extends AbstractVerticle {
     @Override
     public void start() {
         vertx.eventBus().consumer("get.courses.all", this::getAllCourses);
+        vertx.eventBus().consumer("get.courses.id", this::getCoursesByFilter);
     }
 
     private void getAllCourses(Message<JsonArray> msg) {
@@ -45,8 +46,27 @@ public class CoursesVerticle extends AbstractVerticle {
                         });
     }
 
+    private void getCoursesByFilter(Message<JsonArray> msg) {
+        getMetadata(coursesDB, vertx)
+                .map(metadata ->
+                        msg.body().getJsonObject(0).put("metadata", metadata)
+                                .put("keyword", coursesDB))
+                .flatMap(this::getCoursesWithFilterRequest)
+                .subscribe(
+                        msg::reply,
+                        error -> {
+                            LOGGER.error(error);
+                            msg.fail(500, error.getMessage());
+                        });
+    }
+
     private Single<JsonArray> getAllCoursesRequest(JsonArray msgBody) {
         return vertx.eventBus().<JsonArray>rxRequest("get.all.service", msgBody)
+                .map(Message::body);
+    }
+
+    private Single<JsonArray> getCoursesWithFilterRequest(JsonObject msgBody) {
+        return vertx.eventBus().<JsonArray>rxRequest("get.filter.service", new JsonArray().add(msgBody))
                 .map(Message::body);
     }
 }
