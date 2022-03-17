@@ -1,4 +1,4 @@
-package courses;
+package entities;
 
 import io.reactivex.Single;
 import io.vertx.core.json.JsonArray;
@@ -25,7 +25,7 @@ public class CoursesVerticle extends AbstractVerticle {
     @Override
     public void start() {
         vertx.eventBus().consumer("get.courses.all", this::getAllCourses);
-        vertx.eventBus().consumer("get.courses.id", this::getCoursesByFilter);
+        vertx.eventBus().consumer("get.courses.filter", this::getCoursesByFilter);
     }
 
     private void getAllCourses(Message<JsonArray> msg) {

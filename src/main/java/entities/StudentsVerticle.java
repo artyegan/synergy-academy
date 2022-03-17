@@ -1,4 +1,4 @@
-package students;
+package entities;
 
 import io.reactivex.Single;
 import io.vertx.core.json.JsonArray;
@@ -27,7 +27,7 @@ public class StudentsVerticle extends AbstractVerticle {
     public void start() {
         vertx.eventBus().consumer("get.students.all", this::getAllStudents);
         vertx.eventBus().consumer("add.student", this::addStudent);
-        vertx.eventBus().consumer("get.students.id", this::getStudentByFilter);
+        vertx.eventBus().consumer("get.students.filter", this::getStudentByFilter);
         vertx.eventBus().consumer("update.students.id", this::updateStudentById);
 
     }

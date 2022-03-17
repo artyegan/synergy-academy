@@ -6,7 +6,8 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.ProvidesIntoSet;
 import com.google.inject.name.Names;
-import courses.CoursesVerticle;
+import entities.CoursesVerticle;
+import entities.ExamsVerticle;
 import io.vertx.core.Verticle;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.reactivex.core.Vertx;
@@ -18,7 +19,7 @@ import server.RouterBuilderVerticle;
 import server.VerticleDeployer;
 import services.ClassifierServiceVerticle;
 import services.DataServiceVerticle;
-import students.StudentsVerticle;
+import entities.StudentsVerticle;
 
 import javax.inject.Named;
 import java.io.FileNotFoundException;
@@ -107,6 +108,12 @@ public class ProviderModule extends AbstractModule {
     @ProvidesIntoSet
     public Verticle provideCoursesVerticle(@Named("coursesDB") String coursesDB) {
         return new CoursesVerticle(coursesDB);
+    }
+
+    @Inject
+    @ProvidesIntoSet
+    public Verticle provideExamsVerticle(@Named("examsDB") String examsDB) {
+        return new ExamsVerticle(examsDB);
     }
 
     @Inject
