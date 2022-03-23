@@ -33,6 +33,7 @@ public class Handlers {
         handlers.add(Pair.with("getCourseById", this::getCourseById));
         handlers.add(Pair.with("updateCourseById", this::updateCourseById));
         handlers.add(Pair.with("getExamsByCourseId", this::getExamsByCourseId));
+        handlers.add(Pair.with("getExamById", this::getExamById));
         handlers.add(Pair.with("getClassifier", this::getClassifier));
         handlers.add(Pair.with("getConfig", this::getConfig));
 
@@ -136,6 +137,17 @@ public class Handlers {
                 .<JsonArray>rxRequest("get.exams.filter", new JsonArray().add(new JsonObject()
                         .put("value", context.pathParam("courseId"))
                         .put("filterColumn", "courseid")))
+                .subscribe(
+                        result -> addResponseHeaders(context).end(result.body().encodePrettily()),
+                        error -> context.response().setStatusCode(500).end(error.getMessage())
+                );
+    }
+
+    private void getExamById(RoutingContext context) {
+        vertx.eventBus()
+                .<JsonArray>rxRequest("get.exams.filter", new JsonArray().add(new JsonObject()
+                        .put("value", context.pathParam("examId"))
+                        .put("filterColumn", "courseexamid")))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())
