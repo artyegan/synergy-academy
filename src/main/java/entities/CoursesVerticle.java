@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import javax.inject.Inject;
 
 import static meta.MetadataProvider.getMetadata;
+import static meta.MetadataProvider.getMetadataAndExtractId;
 
 public class CoursesVerticle extends AbstractVerticle {
 
@@ -26,6 +27,7 @@ public class CoursesVerticle extends AbstractVerticle {
     public void start() {
         vertx.eventBus().consumer("get.courses.all", this::getAllCourses);
         vertx.eventBus().consumer("get.courses.filter", this::getCoursesByFilter);
+        vertx.eventBus().consumer("add.course", this::addCourse);
     }
 
     private void getAllCourses(Message<JsonArray> msg) {
@@ -60,6 +62,20 @@ public class CoursesVerticle extends AbstractVerticle {
                         });
     }
 
+    private void addCourse(Message<JsonObject> msg) {
+        getMetadataAndExtractId(coursesDB, vertx)
+                .map(metadata ->
+                        msg.body().put("metadata", metadata)
+                                .put("keyword", coursesDB))
+                .flatMap(this::addCourseRequest)
+                .subscribe(
+                        msg::reply,
+                        error -> {
+                            LOGGER.error(error);
+                            msg.fail(500, error.getMessage());
+                        });
+    }
+
     private Single<JsonArray> getAllCoursesRequest(JsonArray msgBody) {
         return vertx.eventBus().<JsonArray>rxRequest("get.all.service", msgBody)
                 .map(Message::body);
@@ -67,6 +83,11 @@ public class CoursesVerticle extends AbstractVerticle {
 
     private Single<JsonArray> getCoursesWithFilterRequest(JsonObject msgBody) {
         return vertx.eventBus().<JsonArray>rxRequest("get.filter.service", new JsonArray().add(msgBody))
+                .map(Message::body);
+    }
+
+    private Single<JsonObject> addCourseRequest(JsonObject msgBody) {
+        return vertx.eventBus().<JsonObject>rxRequest("add.service", msgBody)
                 .map(Message::body);
     }
 }

@@ -2,24 +2,19 @@ package queries;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SqlQueries {
-    public static QueryBuilder getAllQuery(String tableName) {
-        return new QueryBuilder("select")
-                .all()
-                .addFromTable(tableName);
-    }
-
     public static QueryBuilder getFunctionQuery(String function, String... params) {
         return new QueryBuilder("select")
                 .all()
                 .addFromFunction(function, params);
     }
 
-    public static QueryBuilder updateQuery(JsonArray metadata, String id, String tableName, JsonObject data) {
+    public static @NotNull QueryBuilder updateQuery(@NotNull JsonArray metadata, String id, String tableName, JsonObject data) {
         List<String> classifiers = new ArrayList<>();
 
         QueryBuilder queryBuilder = new QueryBuilder("update")
@@ -53,7 +48,7 @@ public class SqlQueries {
         return queryBuilder.addFilterWhere(tableName, tableName + "id", id);
     }
 
-    public static QueryBuilder insertQuery(JsonArray metadata, String tableName, JsonObject data) {
+    public static @NotNull QueryBuilder insertQuery(@NotNull JsonArray metadata, String tableName, JsonObject data) {
         QueryBuilder queryBuilder = new QueryBuilder("insert into")
                 .addTable(tableName)
                 .openBrace();
@@ -77,7 +72,7 @@ public class SqlQueries {
         return queryBuilder.append(selectQuery(metadata, tableName, data).getQuery());
     }
 
-    public static QueryBuilder selectQuery(JsonArray metadata, String tableName, JsonObject data) {
+    public static @NotNull QueryBuilder selectQuery(@NotNull JsonArray metadata, String tableName, JsonObject data) {
         List<String> classifiers = new ArrayList<>();
 
         QueryBuilder queryBuilder = new QueryBuilder("select distinct");
@@ -93,15 +88,15 @@ public class SqlQueries {
                 classifiers.add(currentColumn);
                 queryBuilder.addColumn(modifyClassifierTable(currentColumn), currentColumn);
             } else {
-                if (metadata.getJsonObject(i).getString("data_type").equals("date")) {
-                    queryBuilder.appendData(data.getValue(currentColumn)).append("::date");
-                }
-                else if (metadata.getJsonObject(i).getString("data_type").equals("numeric")) {
-                    queryBuilder.appendData(data.getValue(currentColumn)).append("::numeric");
-                }
-                else {
-                    queryBuilder.appendData(data.getValue(currentColumn));
-                }
+//                if (metadata.getJsonObject(i).getString("data_type").equals("date")) {
+//                    queryBuilder.appendData(data.getValue(currentColumn)).append("::date");
+//                }
+//                else if (metadata.getJsonObject(i).getString("data_type").equals("numeric")) {
+//                    queryBuilder.appendData(data.getValue(currentColumn)).append("::numeric");
+//                }
+                    queryBuilder.appendData(data.getValue(currentColumn)).append("::")
+                            .append(metadata.getJsonObject(i).getString("data_type")).append(" ");
+//(select 1) as t
             }
 
             if (i < metadata.size() - 1) {
@@ -109,7 +104,7 @@ public class SqlQueries {
             }
         }
 
-        queryBuilder.addFromTable(tableName);
+        queryBuilder.append("from (select 1) as t");
 
         for (String classifier : classifiers) {
             queryBuilder.addLeftJoin(modifyClassifierTable(classifier), "name", data.getValue(classifier));
@@ -119,7 +114,7 @@ public class SqlQueries {
     }
 
 
-    public static QueryBuilder selectQuery(JsonArray metadata, String tableName) {
+    public static @NotNull QueryBuilder selectQuery(@NotNull JsonArray metadata, String tableName) {
         List<String> classifiers = new ArrayList<>();
 
         QueryBuilder queryBuilder = new QueryBuilder("select");
@@ -150,7 +145,7 @@ public class SqlQueries {
         return queryBuilder;
     }
 
-    public static QueryBuilder selectQueryFilter(JsonArray metadata, String tableName, String filterColumn, String value) {
+    public static @NotNull QueryBuilder selectQueryFilter(@NotNull JsonArray metadata, String tableName, String filterColumn, String value) {
         QueryBuilder queryBuilder = selectQuery(metadata, tableName);
         queryBuilder.addFilterWhere(tableName, filterColumn, value);
 

@@ -54,6 +54,13 @@ paths:
           description: OK
         500:
           description: error while getting all courses
+    post:
+      operationId: addCourse
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while adding new course
   /courses/{courseId}:
     get:
       operationId: getCourseById

@@ -14,6 +14,7 @@ import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.pgclient.PgPool;
 import io.vertx.sqlclient.PoolOptions;
 import meta.ConfigProviderVerticle;
+import org.jetbrains.annotations.NotNull;
 import server.Handlers;
 import server.RouterBuilderVerticle;
 import server.VerticleDeployer;
@@ -31,7 +32,7 @@ import java.util.Set;
 
 public class ProviderModule extends AbstractModule {
 
-    private void setConfigsFile(Path path) {
+    private void setConfigsFile(@NotNull Path path) {
         Properties properties = new Properties();
         try {
             properties.load(new FileReader(path.toFile()));
