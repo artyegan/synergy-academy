@@ -103,7 +103,7 @@ public class SqlQueries {
             }
         }
 
-        queryBuilder.append("from (select 1) as t");
+        queryBuilder.append("from (select 1) as t ");
 
         for (String classifier : classifiers) {
             queryBuilder.addLeftJoin(modifyClassifierTable(classifier), "name", data.getValue(classifier));
