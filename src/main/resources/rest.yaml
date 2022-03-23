@@ -102,6 +102,19 @@ paths:
           description: OK
         500:
           description: error while getting exams by course id
+    post:
+      operationId: addExam
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while adding new exam
   /exams/{examId}:
     get:
       operationId: getExamById

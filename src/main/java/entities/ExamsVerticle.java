@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import javax.inject.Inject;
 
 import static meta.MetadataProvider.getMetadata;
+import static meta.MetadataProvider.getMetadataAndExtractId;
 
 public class ExamsVerticle extends AbstractVerticle {
     private static final Logger LOGGER = LogManager.getLogger(ExamsVerticle.class);
@@ -24,6 +25,7 @@ public class ExamsVerticle extends AbstractVerticle {
     @Override
     public void start() {
         vertx.eventBus().consumer("get.exams.filter", this::getExamsByFilter);
+        vertx.eventBus().consumer("add.exam", this::addExam);
     }
 
     private void getExamsByFilter(Message<JsonArray> msg) {
@@ -40,8 +42,27 @@ public class ExamsVerticle extends AbstractVerticle {
                         });
     }
 
+    private void addExam(Message<JsonObject> msg) {
+        getMetadataAndExtractId(examsDB, vertx)
+                .map(metadata ->
+                        msg.body().put("metadata", metadata)
+                                .put("keyword", examsDB))
+                .flatMap(this::addExamRequest)
+                .subscribe(
+                        msg::reply,
+                        error -> {
+                            LOGGER.error(error);
+                            msg.fail(500, error.getMessage());
+                        });
+    }
+
     private Single<JsonArray> getExamsWithFilterRequest(JsonObject msgBody) {
         return vertx.eventBus().<JsonArray>rxRequest("get.filter.service", new JsonArray().add(msgBody))
+                .map(Message::body);
+    }
+
+    private Single<JsonObject> addExamRequest(JsonObject msgBody) {
+        return vertx.eventBus().<JsonObject>rxRequest("add.service", msgBody)
                 .map(Message::body);
     }
 }
