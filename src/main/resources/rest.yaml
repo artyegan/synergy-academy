@@ -75,6 +75,19 @@ paths:
           description: OK
         500:
           description: error while getting course by id
+    put:
+      operationId: updateCourseById
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while updating course by id
   /courses/{courseId}/exams:
     get:
       operationId: getExamsByCourseId

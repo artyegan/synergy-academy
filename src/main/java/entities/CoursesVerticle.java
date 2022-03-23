@@ -28,6 +28,7 @@ public class CoursesVerticle extends AbstractVerticle {
         vertx.eventBus().consumer("get.courses.all", this::getAllCourses);
         vertx.eventBus().consumer("get.courses.filter", this::getCoursesByFilter);
         vertx.eventBus().consumer("add.course", this::addCourse);
+        vertx.eventBus().consumer("update.courses.id", this::updateCourseById);
     }
 
     private void getAllCourses(Message<JsonArray> msg) {
@@ -76,6 +77,20 @@ public class CoursesVerticle extends AbstractVerticle {
                         });
     }
 
+    private void updateCourseById(Message<JsonObject> msg) {
+        getMetadataAndExtractId(coursesDB, vertx)
+                .map(metadata ->
+                        msg.body().put("metadata", metadata)
+                                .put("keyword", coursesDB))
+                .flatMap(this::updateCourseByIdRequest)
+                .subscribe(
+                        msg::reply,
+                        error -> {
+                            LOGGER.error(error);
+                            msg.fail(500, error.getMessage());
+                        });
+    }
+
     private Single<JsonArray> getAllCoursesRequest(JsonArray msgBody) {
         return vertx.eventBus().<JsonArray>rxRequest("get.all.service", msgBody)
                 .map(Message::body);
@@ -88,6 +103,11 @@ public class CoursesVerticle extends AbstractVerticle {
 
     private Single<JsonObject> addCourseRequest(JsonObject msgBody) {
         return vertx.eventBus().<JsonObject>rxRequest("add.service", msgBody)
+                .map(Message::body);
+    }
+
+    private Single<JsonObject> updateCourseByIdRequest(JsonObject msgBody) {
+        return vertx.eventBus().<JsonObject>rxRequest("update.id.service", msgBody)
                 .map(Message::body);
     }
 }
