@@ -145,9 +145,19 @@ public class DataServiceVerticle extends AbstractVerticle {
                         msg.body().getString("keyword"),
                         msg.body().getJsonObject("data")).getQuery())
                 .rxExecute()
+                .flatMap(rows -> pgPool.preparedQuery(SqlQueries.getFunctionQuery("getmaxid", "student")
+                        .getQuery())
+                        .rxExecute())
+                .map(rows -> {
+                    for (Row row : rows) {
+                        return row.getInteger(0);
+                    }
+
+                    return -1;
+                })
                 .subscribe(res -> {
                             LOGGER.info("Data inserted in " + msg.body().getString("keyword"));
-                            msg.reply(new JsonObject().put("msg", "Data inserted in " + msg.body().getString("keyword")));
+                            msg.reply(new JsonObject().put("id", res));
                         }, error -> {
                             LOGGER.error(error);
                             msg.fail(500, error.getMessage());

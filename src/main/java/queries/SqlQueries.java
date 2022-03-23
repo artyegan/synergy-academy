@@ -96,7 +96,6 @@ public class SqlQueries {
 //                }
                     queryBuilder.appendData(data.getValue(currentColumn)).append("::")
                             .append(metadata.getJsonObject(i).getString("data_type")).append(" ");
-//(select 1) as t
             }
 
             if (i < metadata.size() - 1) {
