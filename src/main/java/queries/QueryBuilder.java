@@ -14,8 +14,8 @@ public class QueryBuilder {
     }
 
     public <T> QueryBuilder appendData(T data) {
-        if (data instanceof String) {
-            this.appendString((String) data);
+        if (data instanceof String dataString) {
+            this.appendString(dataString);
         } else {
             this.append(data);
         }

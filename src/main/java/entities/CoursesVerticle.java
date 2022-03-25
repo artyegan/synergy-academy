@@ -18,6 +18,9 @@ public class CoursesVerticle extends AbstractVerticle {
     private static final Logger LOGGER = LogManager.getLogger(CoursesVerticle.class);
     private final String coursesDB;
 
+    private static final String KEYWORD = "keyword";
+    private static final String METADATA = "metadata";
+
     @Inject
     public CoursesVerticle(String coursesDB) {
         this.coursesDB = coursesDB;
@@ -36,8 +39,8 @@ public class CoursesVerticle extends AbstractVerticle {
                 .map(metadata ->
                         new JsonArray().add(
                                 new JsonObject()
-                                        .put("metadata", metadata)
-                                        .put("keyword", coursesDB)
+                                        .put(METADATA, metadata)
+                                        .put(KEYWORD, coursesDB)
                         )
                 )
                 .flatMap(this::getAllCoursesRequest)
@@ -52,8 +55,8 @@ public class CoursesVerticle extends AbstractVerticle {
     private void getCoursesByFilter(Message<JsonArray> msg) {
         getMetadata(coursesDB, vertx)
                 .map(metadata ->
-                        msg.body().getJsonObject(0).put("metadata", metadata)
-                                .put("keyword", coursesDB))
+                        msg.body().getJsonObject(0).put(METADATA, metadata)
+                                .put(KEYWORD, coursesDB))
                 .flatMap(this::getCoursesWithFilterRequest)
                 .subscribe(
                         msg::reply,
@@ -66,8 +69,8 @@ public class CoursesVerticle extends AbstractVerticle {
     private void addCourse(Message<JsonObject> msg) {
         getMetadataAndExtractId(coursesDB, vertx)
                 .map(metadata ->
-                        msg.body().put("metadata", metadata)
-                                .put("keyword", coursesDB))
+                        msg.body().put(METADATA, metadata)
+                                .put(KEYWORD, coursesDB))
                 .flatMap(this::addCourseRequest)
                 .subscribe(
                         msg::reply,
@@ -80,8 +83,8 @@ public class CoursesVerticle extends AbstractVerticle {
     private void updateCourseById(Message<JsonObject> msg) {
         getMetadataAndExtractId(coursesDB, vertx)
                 .map(metadata ->
-                        msg.body().put("metadata", metadata)
-                                .put("keyword", coursesDB))
+                        msg.body().put(METADATA, metadata)
+                                .put(KEYWORD, coursesDB))
                 .flatMap(this::updateCourseByIdRequest)
                 .subscribe(
                         msg::reply,

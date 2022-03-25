@@ -17,6 +17,9 @@ public class ExamsVerticle extends AbstractVerticle {
     private static final Logger LOGGER = LogManager.getLogger(ExamsVerticle.class);
     private final String examsDB;
 
+    private static final String KEYWORD = "keyword";
+    private static final String METADATA = "metadata";
+
     @Inject
     public ExamsVerticle(String examsDB) {
         this.examsDB = examsDB;
@@ -32,8 +35,8 @@ public class ExamsVerticle extends AbstractVerticle {
     private void getExamsByFilter(Message<JsonArray> msg) {
         getMetadata(examsDB, vertx)
                 .map(metadata ->
-                        msg.body().getJsonObject(0).put("metadata", metadata)
-                                .put("keyword", examsDB))
+                        msg.body().getJsonObject(0).put(METADATA, metadata)
+                                .put(KEYWORD, examsDB))
                 .flatMap(this::getExamsWithFilterRequest)
                 .subscribe(
                         msg::reply,
@@ -46,8 +49,8 @@ public class ExamsVerticle extends AbstractVerticle {
     private void addExam(Message<JsonObject> msg) {
         getMetadataAndExtractId(examsDB, vertx)
                 .map(metadata ->
-                        msg.body().put("metadata", metadata)
-                                .put("keyword", examsDB))
+                        msg.body().put(METADATA, metadata)
+                                .put(KEYWORD, examsDB))
                 .flatMap(this::addExamRequest)
                 .subscribe(
                         msg::reply,
@@ -60,8 +63,8 @@ public class ExamsVerticle extends AbstractVerticle {
     private void updateExamById(Message<JsonObject> msg) {
         getMetadataAndExtractId(examsDB, vertx)
                 .map(metadata ->
-                        msg.body().put("metadata", metadata)
-                                .put("keyword", examsDB))
+                        msg.body().put(METADATA, metadata)
+                                .put(KEYWORD, examsDB))
                 .flatMap(this::updateExamByIdRequest)
                 .subscribe(
                         msg::reply,

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SqlQueries {
+    private SqlQueries(){}
     public static QueryBuilder getFunctionQuery(String function, String... params) {
         return new QueryBuilder("select")
                 .all()
@@ -27,7 +28,7 @@ public class SqlQueries {
                 continue;
             }
 //todo
-            if (metadata.getJsonObject(i).getBoolean("isclassiferid")) {
+            if (Boolean.TRUE.equals(metadata.getJsonObject(i).getBoolean("isclassiferid"))) {
                 classifiers.add(currentColumn);
                 queryBuilder.addFilterSetColumn(modifyClassifierTable(currentColumn),
                         currentColumn, currentColumn);
@@ -81,16 +82,10 @@ public class SqlQueries {
                 continue;
             }
 
-            if (metadata.getJsonObject(i).getBoolean("isclassiferid")) {
+            if (Boolean.TRUE.equals(metadata.getJsonObject(i).getBoolean("isclassiferid"))) {
                 classifiers.add(currentColumn);
                 queryBuilder.addColumn(modifyClassifierTable(currentColumn), currentColumn);
             } else {
-//                if (metadata.getJsonObject(i).getString("data_type").equals("date")) {
-//                    queryBuilder.appendData(data.getValue(currentColumn)).append("::date");
-//                }
-//                else if (metadata.getJsonObject(i).getString("data_type").equals("numeric")) {
-//                    queryBuilder.appendData(data.getValue(currentColumn)).append("::numeric");
-//                }
                     queryBuilder.appendData(data.getValue(currentColumn)).append("::")
                             .append(metadata.getJsonObject(i).getString("data_type")).append(" ");
             }
@@ -118,7 +113,7 @@ public class SqlQueries {
         for (int i = 0; i < metadata.size(); ++i) {
             String currentColumn = metadata.getJsonObject(i).getString("column_name");
 
-            if (metadata.getJsonObject(i).getBoolean("isclassiferid")) {
+            if (Boolean.TRUE.equals(metadata.getJsonObject(i).getBoolean("isclassiferid"))) {
                 classifiers.add(currentColumn); //todo
                 queryBuilder.addColumn(modifyClassifierTable(currentColumn), "name").append("as ").append(currentColumn);
             } else {

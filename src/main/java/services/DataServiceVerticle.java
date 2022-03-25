@@ -24,6 +24,9 @@ public class DataServiceVerticle extends AbstractVerticle {
     private static final Logger LOGGER = LogManager.getLogger(DataServiceVerticle.class);
     private final PgPool pgPool;
 
+    private static final String KEYWORD = "keyword";
+    private static final String METADATA = "metadata";
+
     @Inject
     public DataServiceVerticle(PgPool pgPool) {
         this.pgPool = pgPool;
@@ -41,8 +44,8 @@ public class DataServiceVerticle extends AbstractVerticle {
     private void getAllHandler(Message<JsonArray> msg) {
         List<String> columnNames = new ArrayList<>();
 
-        String keyword = msg.body().getJsonObject(0).getString("keyword");
-        JsonArray metadata = msg.body().getJsonObject(0).getJsonArray("metadata");
+        String keyword = msg.body().getJsonObject(0).getString(KEYWORD);
+        JsonArray metadata = msg.body().getJsonObject(0).getJsonArray(METADATA);
 
         pgPool.preparedQuery(SqlQueries.selectQuery(metadata, keyword).getQuery())
                 .rxExecute()
@@ -67,8 +70,8 @@ public class DataServiceVerticle extends AbstractVerticle {
 
         JsonObject msgBody = msg.body().getJsonObject(0);
 
-        JsonArray metadata = msgBody.getJsonArray("metadata");
-        String keyword = msgBody.getString("keyword");
+        JsonArray metadata = msgBody.getJsonArray(METADATA);
+        String keyword = msgBody.getString(KEYWORD);
         String filterColumn = msgBody.getString("filterColumn");
         String value = msgBody.getString("value");
 
@@ -95,7 +98,7 @@ public class DataServiceVerticle extends AbstractVerticle {
         List<String> columnNames = new ArrayList<>();
         String keyword = msg.body()
                 .getJsonObject(0)
-                .getString("keyword");
+                .getString(KEYWORD);
         String function = msg.body()
                 .getJsonObject(0)
                 .getString("function");
@@ -109,7 +112,7 @@ public class DataServiceVerticle extends AbstractVerticle {
                 .map(row -> this.addRowToJson(columnNames, row))
                 .toList()
                 .subscribe(list -> {
-                    LOGGER.info("Got all " + keyword + " from db");
+                    LOGGER.info(String.format("Got all %s from db", keyword));
                     msg.reply(new JsonArray(list));
                 }, error -> {
                     LOGGER.error(error);
@@ -119,16 +122,16 @@ public class DataServiceVerticle extends AbstractVerticle {
 
     private void updateIdHandler(Message<JsonObject> msg) {
         pgPool.preparedQuery(SqlQueries.updateQuery(
-                        msg.body().getJsonArray("metadata"),
+                        msg.body().getJsonArray(METADATA),
                         msg.body().getString("id"),
-                        msg.body().getString("keyword"),
+                        msg.body().getString(KEYWORD),
                         msg.body().getJsonObject("data")).getQuery())
                 .rxExecute()
                 .subscribe(res -> {
-                            LOGGER.info(msg.body().getString("keyword") + " " +
-                                    msg.body().getString("id")
-                                    + " updated");
-                            msg.reply(new JsonObject().put("msg", msg.body().getString("keyword") + " " +
+                    LOGGER.info(
+                            String.format(
+                                    "%s %s updated", msg.body().getString(KEYWORD), msg.body().getString("id")));
+                    msg.reply(new JsonObject().put("msg", msg.body().getString(KEYWORD) + " " +
                                     msg.body().getString("id") +
                                     " updated"));
                         }, error -> {
@@ -140,16 +143,16 @@ public class DataServiceVerticle extends AbstractVerticle {
 
     private void addHandler(Message<JsonObject> msg) {
         pgPool.preparedQuery(SqlQueries.insertQuery(
-                        msg.body().getJsonArray("metadata"),
-                        msg.body().getString("keyword"),
+                        msg.body().getJsonArray(METADATA),
+                        msg.body().getString(KEYWORD),
                         msg.body().getJsonObject("data")).getQuery())
                 .rxExecute()
-                .flatMap(rows -> pgPool.preparedQuery(SqlQueries.getFunctionQuery("getmaxid", msg.body().getString("keyword"))
+                .flatMap(rows -> pgPool.preparedQuery(SqlQueries.getFunctionQuery("getmaxid", msg.body().getString(KEYWORD))
                         .getQuery())
                         .rxExecute())
                 .map(rows -> rows.iterator().next().getInteger(0))
                 .subscribe(res -> {
-                            LOGGER.info("Data inserted in " + msg.body().getString("keyword"));
+                            LOGGER.info(String.format("Data inserted in %s", msg.body().getString(KEYWORD)));
                             msg.reply(new JsonObject().put("id", res));
                         }, error -> {
                             LOGGER.error(error);
@@ -163,12 +166,12 @@ public class DataServiceVerticle extends AbstractVerticle {
 
         columnNames.forEach(columnName -> {
 
-            if (row.getValue(columnName) instanceof LocalDateTime) {
+            if (row.getValue(columnName) instanceof LocalDateTime localDateTime) {
                 jsonObject.put(columnName,
-                        ((LocalDateTime) row.getValue(columnName)).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-            } else if (row.getValue(columnName) instanceof LocalDate) {
+                        localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            } else if (row.getValue(columnName) instanceof LocalDate localDate) {
                 jsonObject.put(columnName,
-                        ((LocalDate) row.getValue(columnName)).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                        localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             } else {
                 jsonObject.put(columnName, row.getValue(columnName));
             }

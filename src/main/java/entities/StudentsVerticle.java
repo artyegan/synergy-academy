@@ -18,6 +18,9 @@ public class StudentsVerticle extends AbstractVerticle {
     private static final Logger LOGGER = LogManager.getLogger(StudentsVerticle.class);
     private final String studentsDB;
 
+    private static final String KEYWORD = "keyword";
+    private static final String METADATA = "metadata";
+
     @Inject
     public StudentsVerticle(String studentsDB) {
         this.studentsDB = studentsDB;
@@ -37,8 +40,8 @@ public class StudentsVerticle extends AbstractVerticle {
                 .map(metadata ->
                     new JsonArray().add(
                             new JsonObject()
-                                    .put("metadata", metadata)
-                                    .put("keyword", studentsDB)
+                                    .put(METADATA, metadata)
+                                    .put(KEYWORD, studentsDB)
                     )
                 )
                 .flatMap(this::getAllStudentsRequest)
@@ -53,8 +56,8 @@ public class StudentsVerticle extends AbstractVerticle {
     private void addStudent(Message<JsonObject> msg) {
         getMetadataAndExtractId(studentsDB, vertx)
                 .map(metadata ->
-                        msg.body().put("metadata", metadata)
-                                .put("keyword", studentsDB))
+                        msg.body().put(METADATA, metadata)
+                                .put(KEYWORD, studentsDB))
                 .flatMap(this::addStudentRequest)
                 .subscribe(
                         msg::reply,
@@ -67,8 +70,8 @@ public class StudentsVerticle extends AbstractVerticle {
     private void getStudentByFilter(Message<JsonArray> msg) {
         getMetadata(studentsDB, vertx)
                 .map(metadata ->
-                        msg.body().getJsonObject(0).put("metadata", metadata)
-                                .put("keyword", studentsDB))
+                        msg.body().getJsonObject(0).put(METADATA, metadata)
+                                .put(KEYWORD, studentsDB))
                 .flatMap(this::getStudentsWithFilterRequest)
                 .subscribe(
                         msg::reply,
@@ -81,8 +84,8 @@ public class StudentsVerticle extends AbstractVerticle {
     private void updateStudentById(Message<JsonObject> msg) {
         getMetadataAndExtractId(studentsDB, vertx)
                 .map(metadata ->
-                        msg.body().put("metadata", metadata)
-                                .put("keyword", studentsDB))
+                        msg.body().put(METADATA, metadata)
+                                .put(KEYWORD, studentsDB))
                 .flatMap(this::updateStudentByIdRequest)
                 .subscribe(
                         msg::reply,

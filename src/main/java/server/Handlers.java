@@ -13,8 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Handlers {
-    private List<Pair<String, Handler<RoutingContext>>> handlers;
     private final Vertx vertx;
+    private static final String VALUE = "value";
+    private static final String FILTERCOLUMN = "filterColumn";
+    private static final String ID = "id";
+    private static final String DATA = "data";
 
     @Inject
     public Handlers(Vertx vertx) {
@@ -22,24 +25,24 @@ public class Handlers {
     }
 
     public List<Pair<String, Handler<RoutingContext>>> getHandlers() {
-        handlers = new ArrayList<>();
+        List<Pair<String, Handler<RoutingContext>>> handlersList = new ArrayList<>();
 
-        handlers.add(Pair.with("getAllStudents", this::getAllStudents));
-        handlers.add(Pair.with("addStudent", this::addStudent));
-        handlers.add(Pair.with("getStudentById", this::getStudentById));
-        handlers.add(Pair.with("updateStudentById", this::updateStudentById));
-        handlers.add(Pair.with("getAllCourses", this::getAllCourses));
-        handlers.add(Pair.with("addCourse", this::addCourse));
-        handlers.add(Pair.with("getCourseById", this::getCourseById));
-        handlers.add(Pair.with("updateCourseById", this::updateCourseById));
-        handlers.add(Pair.with("getExamsByCourseId", this::getExamsByCourseId));
-        handlers.add(Pair.with("addExam", this::addExam));
-        handlers.add(Pair.with("getExamById", this::getExamById));
-        handlers.add(Pair.with("updateExamById", this::updateExamById));
-        handlers.add(Pair.with("getClassifier", this::getClassifier));
-        handlers.add(Pair.with("getConfig", this::getConfig));
+        handlersList.add(Pair.with("getAllStudents", this::getAllStudents));
+        handlersList.add(Pair.with("addStudent", this::addStudent));
+        handlersList.add(Pair.with("getStudentById", this::getStudentById));
+        handlersList.add(Pair.with("updateStudentById", this::updateStudentById));
+        handlersList.add(Pair.with("getAllCourses", this::getAllCourses));
+        handlersList.add(Pair.with("addCourse", this::addCourse));
+        handlersList.add(Pair.with("getCourseById", this::getCourseById));
+        handlersList.add(Pair.with("updateCourseById", this::updateCourseById));
+        handlersList.add(Pair.with("getExamsByCourseId", this::getExamsByCourseId));
+        handlersList.add(Pair.with("addExam", this::addExam));
+        handlersList.add(Pair.with("getExamById", this::getExamById));
+        handlersList.add(Pair.with("updateExamById", this::updateExamById));
+        handlersList.add(Pair.with("getClassifier", this::getClassifier));
+        handlersList.add(Pair.with("getConfig", this::getConfig));
 
-        return handlers;
+        return handlersList;
     }
 
     private HttpServerResponse addResponseHeaders(RoutingContext context) {
@@ -62,7 +65,7 @@ public class Handlers {
     private void addStudent(RoutingContext context) {
         vertx.eventBus()
                 .<JsonObject>rxRequest("add.student",
-                        new JsonObject().put("data", context.getBodyAsJson()))
+                        new JsonObject().put(DATA, context.getBodyAsJson()))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())
@@ -72,8 +75,8 @@ public class Handlers {
     private void getStudentById(RoutingContext context) {
         vertx.eventBus()
                 .<JsonArray>rxRequest("get.students.filter", new JsonArray().add(new JsonObject()
-                        .put("value", context.pathParam("studentId"))
-                        .put("filterColumn", "studentid")))
+                        .put(VALUE, context.pathParam("studentId"))
+                        .put(FILTERCOLUMN, "studentid")))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())
@@ -84,8 +87,8 @@ public class Handlers {
         vertx.eventBus()
                 .<JsonObject>rxRequest("update.students.id",
                         new JsonObject()
-                                .put("id", context.pathParam("studentId"))
-                                .put("data", context.getBodyAsJson()))
+                                .put(ID, context.pathParam("studentId"))
+                                .put(DATA, context.getBodyAsJson()))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())
@@ -104,7 +107,7 @@ public class Handlers {
     private void addCourse(RoutingContext context) {
         vertx.eventBus()
                 .<JsonObject>rxRequest("add.course",
-                        new JsonObject().put("data", context.getBodyAsJson()))
+                        new JsonObject().put(DATA, context.getBodyAsJson()))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())
@@ -114,8 +117,8 @@ public class Handlers {
     private void getCourseById(RoutingContext context) {
         vertx.eventBus()
                 .<JsonArray>rxRequest("get.courses.filter", new JsonArray().add(new JsonObject()
-                        .put("value", context.pathParam("courseId"))
-                        .put("filterColumn", "courseid")))
+                        .put(VALUE, context.pathParam("courseId"))
+                        .put(FILTERCOLUMN, "courseid")))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())
@@ -126,8 +129,8 @@ public class Handlers {
         vertx.eventBus()
                 .<JsonObject>rxRequest("update.courses.id",
                         new JsonObject()
-                                .put("id", context.pathParam("courseId"))
-                                .put("data", context.getBodyAsJson()))
+                                .put(ID, context.pathParam("courseId"))
+                                .put(DATA, context.getBodyAsJson()))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())
@@ -137,8 +140,8 @@ public class Handlers {
     private void getExamsByCourseId(RoutingContext context) {
         vertx.eventBus()
                 .<JsonArray>rxRequest("get.exams.filter", new JsonArray().add(new JsonObject()
-                        .put("value", context.pathParam("courseId"))
-                        .put("filterColumn", "courseid")))
+                        .put(VALUE, context.pathParam("courseId"))
+                        .put(FILTERCOLUMN, "courseid")))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())
@@ -148,7 +151,7 @@ public class Handlers {
     private void addExam(RoutingContext context) {
         vertx.eventBus()
                 .<JsonObject>rxRequest("add.exam",
-                        new JsonObject().put("data", context.getBodyAsJson()))
+                        new JsonObject().put(DATA, context.getBodyAsJson()))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())
@@ -158,8 +161,8 @@ public class Handlers {
     private void getExamById(RoutingContext context) {
         vertx.eventBus()
                 .<JsonArray>rxRequest("get.exams.filter", new JsonArray().add(new JsonObject()
-                        .put("value", context.pathParam("examId"))
-                        .put("filterColumn", "courseexamid")))
+                        .put(VALUE, context.pathParam("examId"))
+                        .put(FILTERCOLUMN, "courseexamid")))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())
@@ -170,8 +173,8 @@ public class Handlers {
         vertx.eventBus()
                 .<JsonObject>rxRequest("update.exams.id",
                         new JsonObject()
-                                .put("id", context.pathParam("examId"))
-                                .put("data", context.getBodyAsJson()))
+                                .put(ID, context.pathParam("examId"))
+                                .put(DATA, context.getBodyAsJson()))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())
@@ -194,8 +197,8 @@ public class Handlers {
     private void getConfig(RoutingContext context) {
         vertx.eventBus()
                 .<JsonArray>rxRequest("get.config", new JsonArray().add(new JsonObject()
-                        .put("value", context.pathParam("type"))
-                        .put("filterColumn", "type")))
+                        .put(VALUE, context.pathParam("type"))
+                        .put(FILTERCOLUMN, "type")))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())

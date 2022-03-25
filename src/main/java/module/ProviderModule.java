@@ -14,6 +14,8 @@ import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.pgclient.PgPool;
 import io.vertx.sqlclient.PoolOptions;
 import meta.ConfigProviderVerticle;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import server.Handlers;
 import server.RouterBuilderVerticle;
@@ -32,15 +34,18 @@ import java.util.Set;
 
 public class ProviderModule extends AbstractModule {
 
+    private static final Logger LOGGER = LogManager.getLogger(ProviderModule.class);
+
     private void setConfigsFile(@NotNull Path path) {
         Properties properties = new Properties();
-        try {
-            properties.load(new FileReader(path.toFile()));
+        try (FileReader fileReader = new FileReader(path.toFile())) {
+            properties.load(fileReader);
             Names.bindProperties(binder(), properties);
+            LOGGER.info("Properties loaded");
         } catch (FileNotFoundException e) {
-            System.out.println("The configuration file" + path.getFileName() + "can not be found");
+            LOGGER.error(String.format("The configuration file %s can not be found", path.getFileName().toString()));
         } catch (IOException e) {
-            System.out.println("I/O Exception during loading configuration");
+            LOGGER.error("I/O Exception during loading configuration");
         }
     }
 
