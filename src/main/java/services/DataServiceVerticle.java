@@ -54,7 +54,7 @@ public class DataServiceVerticle extends AbstractVerticle {
                 .map(row -> this.addRowToJson(columnNames, row))
                 .toList()
                 .subscribe(list -> {
-                    LOGGER.info("Got all " + keyword + " from db");
+                    LOGGER.info(String.format("Got all %s from db", keyword));
                     msg.reply(new JsonArray(list));
                 }, error -> {
                     LOGGER.error(error);
@@ -82,7 +82,7 @@ public class DataServiceVerticle extends AbstractVerticle {
                 .map(row -> this.addRowToJson(columnNames, row))
                 .toList()
                 .subscribe(json -> {
-                            LOGGER.info("Got " + keyword + " by " + filterColumn);
+                            LOGGER.info(String.format("Got %s by %s", keyword, filterColumn));
                             msg.reply(new JsonArray(json));
                         },
                         error -> {
@@ -99,7 +99,6 @@ public class DataServiceVerticle extends AbstractVerticle {
         String function = msg.body()
                 .getJsonObject(0)
                 .getString("function");
-        ;
         pgPool.preparedQuery(SqlQueries.getFunctionQuery(function, keyword).getQuery())
                 .rxExecute()
                 .map(rowSet -> {
@@ -145,16 +144,10 @@ public class DataServiceVerticle extends AbstractVerticle {
                         msg.body().getString("keyword"),
                         msg.body().getJsonObject("data")).getQuery())
                 .rxExecute()
-                .flatMap(rows -> pgPool.preparedQuery(SqlQueries.getFunctionQuery("getmaxid", "student")
+                .flatMap(rows -> pgPool.preparedQuery(SqlQueries.getFunctionQuery("getmaxid", msg.body().getString("keyword"))
                         .getQuery())
                         .rxExecute())
-                .map(rows -> {
-                    for (Row row : rows) {
-                        return row.getInteger(0);
-                    }
-
-                    return -1;
-                })
+                .map(rows -> rows.iterator().next().getInteger(0))
                 .subscribe(res -> {
                             LOGGER.info("Data inserted in " + msg.body().getString("keyword"));
                             msg.reply(new JsonObject().put("id", res));
