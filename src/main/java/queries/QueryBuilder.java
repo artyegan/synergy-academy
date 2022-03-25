@@ -120,6 +120,10 @@ public class QueryBuilder {
         return this.append(", ");
     }
 
+    public QueryBuilder addFromOne() {
+        return this.append("from (select 1) as t ");
+    }
+
     public String getQuery() {
         return this.currentQuery.toString();
     }

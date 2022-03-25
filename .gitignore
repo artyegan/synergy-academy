@@ -8,3 +8,5 @@ config
 # Ignore log files
 synergy-academy.log
 synergy-academy1.log
+# Ignore packages
+node_modules

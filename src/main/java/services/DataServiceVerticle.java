@@ -34,7 +34,7 @@ public class DataServiceVerticle extends AbstractVerticle {
         vertx.eventBus().consumer("get.all.service", this::getAllHandler);
         vertx.eventBus().consumer("get.filter.service", this::getFilterHandler);
         vertx.eventBus().consumer("update.id.service", this::updateIdHandler);
-        vertx.eventBus().consumer("get.metadata.service", this::getMetadataHandler);
+        vertx.eventBus().consumer("get.function.service", this::getFunctionHandler);
         vertx.eventBus().consumer("add.service", this::addHandler);
     }
 
@@ -91,7 +91,7 @@ public class DataServiceVerticle extends AbstractVerticle {
                         });
     }
 
-    private void getMetadataHandler(Message<JsonArray> msg) {
+    private void getFunctionHandler(Message<JsonArray> msg) {
         List<String> columnNames = new ArrayList<>();
         String keyword = msg.body()
                 .getJsonObject(0)

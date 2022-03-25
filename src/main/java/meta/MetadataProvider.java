@@ -10,7 +10,7 @@ import io.vertx.reactivex.core.eventbus.Message;
 public class MetadataProvider {
 
     public static Single<JsonArray> getMetadata(String keyword, Vertx vertx) {
-        return vertx.eventBus().<JsonArray>rxRequest("get.metadata.service",
+        return vertx.eventBus().<JsonArray>rxRequest("get.function.service",
                         new JsonArray().add(new JsonObject()
                                 .put("function", "getcolumnbytablenamewithclassiferbool")
                                 .put("keyword", keyword)))

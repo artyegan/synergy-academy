@@ -36,13 +36,10 @@ public class SqlQueries {
             }
         }
 
-        for (String classifier : classifiers) {
-            queryBuilder.addFromTable(modifyClassifierTable(classifier));
-        }
+        queryBuilder.addFromOne();
 
         for (String classifier : classifiers) {
-            queryBuilder.addFilterWhere(modifyClassifierTable(classifier),
-                    "name", data.getValue(classifier));
+            queryBuilder.addLeftJoin(modifyClassifierTable(classifier), "name", data.getValue(classifier));
         }
 
         return queryBuilder.addFilterWhere(tableName, tableName + "id", id);
@@ -103,7 +100,7 @@ public class SqlQueries {
             }
         }
 
-        queryBuilder.append("from (select 1) as t ");
+        queryBuilder.addFromOne();
 
         for (String classifier : classifiers) {
             queryBuilder.addLeftJoin(modifyClassifierTable(classifier), "name", data.getValue(classifier));
