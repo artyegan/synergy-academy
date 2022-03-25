@@ -57,7 +57,7 @@ public class DataServiceVerticle extends AbstractVerticle {
                 .map(row -> this.addRowToJson(columnNames, row))
                 .toList()
                 .subscribe(list -> {
-                    LOGGER.info(String.format("Got all %s from db", keyword));
+                    LOGGER.info(String.format("Get all %s from db", keyword));
                     msg.reply(new JsonArray(list));
                 }, error -> {
                     LOGGER.error(error);
@@ -85,7 +85,7 @@ public class DataServiceVerticle extends AbstractVerticle {
                 .map(row -> this.addRowToJson(columnNames, row))
                 .toList()
                 .subscribe(json -> {
-                            LOGGER.info(String.format("Got %s by %s", keyword, filterColumn));
+                            LOGGER.info(String.format("Get %s by %s", keyword, filterColumn));
                             msg.reply(new JsonArray(json));
                         },
                         error -> {
@@ -112,7 +112,7 @@ public class DataServiceVerticle extends AbstractVerticle {
                 .map(row -> this.addRowToJson(columnNames, row))
                 .toList()
                 .subscribe(list -> {
-                    LOGGER.info(String.format("Got all %s from db", keyword));
+                    LOGGER.info(String.format("Get data with function from %s(possibly metadata)", keyword));
                     msg.reply(new JsonArray(list));
                 }, error -> {
                     LOGGER.error(error);

@@ -100,8 +100,11 @@ public class ProviderModule extends AbstractModule {
 
     @Inject
     @ProvidesIntoSet
-    public Verticle provideRouterBuilderVerticle(Handlers handlers, @Named("serverPort") int serverPort) {
-        return new RouterBuilderVerticle(handlers, serverPort);
+    public Verticle provideRouterBuilderVerticle(
+            Handlers handlers,
+            @Named("serverPort") int serverPort,
+            @Named("restUrl") String restUrl) {
+        return new RouterBuilderVerticle(handlers, serverPort, restUrl);
     }
 
     @Inject
