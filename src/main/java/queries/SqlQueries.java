@@ -9,7 +9,8 @@ import java.util.List;
 
 public class SqlQueries {
     private SqlQueries(){}
-    public static QueryBuilder getFunctionQuery(String function, String... params) {
+    @SafeVarargs
+    public static <T> QueryBuilder getFunctionQuery(String function, T... params) {
         return new QueryBuilder("select")
                 .all()
                 .addFromFunction(function, params);

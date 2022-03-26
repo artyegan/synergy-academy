@@ -142,6 +142,20 @@ paths:
           description: OK
         500:
           description: error while updating exam by id
+  /exams/{examId}/students:
+    get:
+      operationId: getStudentsByExamId
+      parameters:
+        - in: path
+          name: examId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while getting students by exam id
   /classifierservice/{tableName}:
     get:
       operationId: getClassifier

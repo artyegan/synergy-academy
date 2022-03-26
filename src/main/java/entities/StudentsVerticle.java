@@ -32,6 +32,7 @@ public class StudentsVerticle extends AbstractVerticle {
         vertx.eventBus().consumer("add.student", this::addStudent);
         vertx.eventBus().consumer("get.students.filter", this::getStudentByFilter);
         vertx.eventBus().consumer("update.students.id", this::updateStudentById);
+        vertx.eventBus().consumer("get.students.function", this::getStudentsWithFunction);
 
     }
 
@@ -81,6 +82,16 @@ public class StudentsVerticle extends AbstractVerticle {
                         });
     }
 
+    private void getStudentsWithFunction(Message<JsonArray> msg) {
+                getStudentsWithFunctionRequest(msg.body())
+                .subscribe(
+                        msg::reply,
+                        error -> {
+                            LOGGER.error(error);
+                            msg.fail(500, error.getMessage());
+                        });
+    }
+
     private void updateStudentById(Message<JsonObject> msg) {
         getMetadataAndExtractId(studentsDB, vertx)
                 .map(metadata ->
@@ -112,6 +123,11 @@ public class StudentsVerticle extends AbstractVerticle {
 
     private Single<JsonObject> addStudentRequest(JsonObject msgBody) {
         return vertx.eventBus().<JsonObject>rxRequest("add.service", msgBody)
+                .map(Message::body);
+    }
+
+    private Single<JsonArray> getStudentsWithFunctionRequest(JsonArray msgBody) {
+        return vertx.eventBus().<JsonArray>rxRequest("get.function.service", msgBody)
                 .map(Message::body);
     }
 }
