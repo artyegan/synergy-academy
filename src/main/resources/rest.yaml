@@ -156,6 +156,20 @@ paths:
           description: OK
         500:
           description: error while getting students by exam id
+  /exams/{examId}/results:
+    get:
+      operationId: getResultsByExamId
+      parameters:
+        - in: path
+          name: examId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while getting results by exam id
   /classifierservice/{tableName}:
     get:
       operationId: getClassifier

@@ -40,6 +40,7 @@ public class Handlers {
         handlersList.add(Pair.with("getExamById", this::getExamById));
         handlersList.add(Pair.with("updateExamById", this::updateExamById));
         handlersList.add(Pair.with("getStudentsByExamId", this::getStudentsByExamId));
+        handlersList.add(Pair.with("getResultsByExamId", this::getResultsByExamId));
         handlersList.add(Pair.with("getClassifier", this::getClassifier));
         handlersList.add(Pair.with("getConfig", this::getConfig));
 
@@ -175,6 +176,17 @@ public class Handlers {
                 .<JsonArray>rxRequest("get.students.function", new JsonArray().add(new JsonObject()
                         .put("keyword", context.pathParam("examId"))
                         .put("function", "getstudentsbyexamid")))
+                .subscribe(
+                        result -> addResponseHeaders(context).end(result.body().encodePrettily()),
+                        error -> context.response().setStatusCode(500).end(error.getMessage())
+                );
+    }
+
+    private void getResultsByExamId(RoutingContext context) {
+        vertx.eventBus()
+                .<JsonArray>rxRequest("get.results.function", new JsonArray().add(new JsonObject()
+                        .put("keyword", context.pathParam("examId"))
+                        .put("function", "getresultsbyexamid")))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())

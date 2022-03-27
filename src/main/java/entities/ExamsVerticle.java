@@ -30,6 +30,7 @@ public class ExamsVerticle extends AbstractVerticle {
         vertx.eventBus().consumer("get.exams.filter", this::getExamsByFilter);
         vertx.eventBus().consumer("add.exam", this::addExam);
         vertx.eventBus().consumer("update.exams.id", this::updateExamById);
+        vertx.eventBus().consumer("get.results.function", this::getResultsWithFunction);
     }
 
     private void getExamsByFilter(Message<JsonArray> msg) {
@@ -52,6 +53,16 @@ public class ExamsVerticle extends AbstractVerticle {
                         msg.body().put(METADATA, metadata)
                                 .put(KEYWORD, examsDB))
                 .flatMap(this::addExamRequest)
+                .subscribe(
+                        msg::reply,
+                        error -> {
+                            LOGGER.error(error);
+                            msg.fail(500, error.getMessage());
+                        });
+    }
+
+    private void getResultsWithFunction(Message<JsonArray> msg) {
+        getResultsWithFunctionRequest(msg.body())
                 .subscribe(
                         msg::reply,
                         error -> {
@@ -86,6 +97,12 @@ public class ExamsVerticle extends AbstractVerticle {
 
     private Single<JsonObject> updateExamByIdRequest(JsonObject msgBody) {
         return vertx.eventBus().<JsonObject>rxRequest("update.id.service", msgBody)
+                .map(Message::body);
+    }
+
+
+    private Single<JsonArray> getResultsWithFunctionRequest(JsonArray msgBody) {
+        return vertx.eventBus().<JsonArray>rxRequest("get.function.service", msgBody)
                 .map(Message::body);
     }
 }

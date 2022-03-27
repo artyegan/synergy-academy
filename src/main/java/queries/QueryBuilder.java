@@ -63,7 +63,7 @@ public class QueryBuilder {
 
     public <T> QueryBuilder addLeftJoin(String table, String column, T data) {
         return this.append("left join ").addTable(table).append(" ")
-                .append("on ").addColumn(table, column).append("= ").appendData(data);
+                .append("on ").addColumn(table, column).append("= ").appendData(data).append(" ");
     }
 
     public QueryBuilder addLeftJoinColumn(String table1, String table2, String column1, String column2) {
