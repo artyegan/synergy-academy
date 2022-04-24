@@ -115,6 +115,20 @@ paths:
           description: OK
         500:
           description: error while adding new exam
+  /courses/{courseId}/students:
+    get:
+      operationId: getStudentsByCourseId
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while getting students by course id
   /exams/{examId}:
     get:
       operationId: getExamById
@@ -170,6 +184,19 @@ paths:
           description: OK
         500:
           description: error while getting results by exam id
+    put:
+      operationId: updateResults
+      parameters:
+        - in: path
+          name: examId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while updating results
   /classifierservice/{tableName}:
     get:
       operationId: getClassifier
