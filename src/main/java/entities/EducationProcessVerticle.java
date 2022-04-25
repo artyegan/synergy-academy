@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 import javax.inject.Inject;
 
 public class EducationProcessVerticle extends AbstractVerticle {
-    private static final Logger LOGGER = LogManager.getLogger(CoursesVerticle.class);
+    private static final Logger LOGGER = LogManager.getLogger(EducationProcessVerticle.class);
     private final String educationProcessDB;
 
     private static final String KEYWORD = "keyword";
@@ -22,7 +22,7 @@ public class EducationProcessVerticle extends AbstractVerticle {
     }
 
     @Override
-    public void start() throws Exception {
+    public void start() {
         vertx.eventBus().<JsonArray>consumer("get.educationprocess.function").handler(this::getEducationProcessWithFunction);
     }
 

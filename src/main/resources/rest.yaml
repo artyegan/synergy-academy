@@ -157,6 +157,20 @@ paths:
           description: OK
         500:
           description: error while getting education process by id
+  /educationprocess/{educationProcessId}/grades:
+    get:
+      operationId: getGradesByEducationProcessId
+      parameters:
+        - in: path
+          name: educationProcessId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while getting grades by education process id
   /exams/{examId}:
     get:
       operationId: getExamById
