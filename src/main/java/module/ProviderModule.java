@@ -7,6 +7,7 @@ import com.google.inject.Singleton;
 import com.google.inject.multibindings.ProvidesIntoSet;
 import com.google.inject.name.Names;
 import entities.CoursesVerticle;
+import entities.EducationProcessVerticle;
 import entities.ExamsVerticle;
 import io.vertx.core.Verticle;
 import io.vertx.pgclient.PgConnectOptions;
@@ -123,6 +124,13 @@ public class ProviderModule extends AbstractModule {
     @ProvidesIntoSet
     public Verticle provideExamsVerticle(@Named("examsDB") String examsDB) {
         return new ExamsVerticle(examsDB);
+    }
+
+
+    @Inject
+    @ProvidesIntoSet
+    public Verticle provideEducationProcessVerticle(@Named("educationProcessDB") String educationProcessDB) {
+        return new EducationProcessVerticle(educationProcessDB);
     }
 
     @Inject

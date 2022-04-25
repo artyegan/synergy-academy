@@ -129,6 +129,20 @@ paths:
           description: OK
         500:
           description: error while getting students by course id
+  /courses/{courseId}/educationprocess:
+    get:
+      operationId: getEducationProcessByCourseId
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while getting education process by course id
   /exams/{examId}:
     get:
       operationId: getExamById

@@ -37,6 +37,7 @@ public class Handlers {
         handlersList.add(Pair.with("updateCourseById", this::updateCourseById));
         handlersList.add(Pair.with("getExamsByCourseId", this::getExamsByCourseId));
         handlersList.add(Pair.with("getStudentsByCourseId", this::getStudentsByCourseId));
+        handlersList.add(Pair.with("getEducationProcessByCourseId", this::getEducationProcessByCourseId));
         handlersList.add(Pair.with("addExam", this::addExam));
         handlersList.add(Pair.with("getExamById", this::getExamById));
         handlersList.add(Pair.with("updateExamById", this::updateExamById));
@@ -156,6 +157,17 @@ public class Handlers {
                 .<JsonArray>rxRequest("get.students.function", new JsonArray().add(new JsonObject()
                         .put("keyword", context.pathParam("courseId"))
                         .put("function", "getstudentsbycourseid")))
+                .subscribe(
+                        result -> addResponseHeaders(context).end(result.body().encodePrettily()),
+                        error -> context.response().setStatusCode(500).end(error.getMessage())
+                );
+    }
+
+    private void getEducationProcessByCourseId(RoutingContext context) {
+        vertx.eventBus()
+                .<JsonArray>rxRequest("get.educationprocess.function", new JsonArray().add(new JsonObject()
+                        .put("keyword", context.pathParam("courseId"))
+                        .put("function", "geteducationprocesssubjects")))
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())
