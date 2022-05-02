@@ -239,6 +239,14 @@ paths:
           description: OK
         500:
           description: error while updating results
+  /reports:
+    get:
+      operationId: getReportsWithFunction
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while getting reports
   /classifierservice/{tableName}:
     get:
       operationId: getClassifier

@@ -33,7 +33,6 @@ public class StudentsVerticle extends AbstractVerticle {
         vertx.eventBus().consumer("get.students.filter", this::getStudentByFilter);
         vertx.eventBus().consumer("update.students.id", this::updateStudentById);
         vertx.eventBus().consumer("get.students.function", this::getStudentsWithFunction);
-
     }
 
     private void getAllStudents(Message<JsonArray> msg) {

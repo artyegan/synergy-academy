@@ -28,7 +28,6 @@ public class SqlQueries {
             if (!data.containsKey(currentColumn)) {
                 continue;
             }
-//todo
             if (Boolean.TRUE.equals(metadata.getJsonObject(i).getBoolean("isclassiferid"))) {
                 classifiers.add(currentColumn);
                 queryBuilder.addFilterSetColumn(modifyClassifierTable(currentColumn),
@@ -115,7 +114,7 @@ public class SqlQueries {
             String currentColumn = metadata.getJsonObject(i).getString("column_name");
 
             if (Boolean.TRUE.equals(metadata.getJsonObject(i).getBoolean("isclassiferid"))) {
-                classifiers.add(currentColumn); //todo
+                classifiers.add(currentColumn);
                 queryBuilder.addColumn(modifyClassifierTable(currentColumn), "name").append("as ").append(currentColumn);
             } else {
                 queryBuilder.addColumn(tableName, currentColumn);

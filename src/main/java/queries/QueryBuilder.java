@@ -78,7 +78,11 @@ public class QueryBuilder {
             this.appendData(params[i]).append(", ");
         }
 
-        return this.appendData(params[params.length - 1]).append(") ");
+        if (params[0] == null) {
+            return this.append(") ");
+        } else  {
+            return this.appendData(params[params.length - 1]).append(") ");
+        }
     }
 
     public QueryBuilder all() {

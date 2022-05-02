@@ -27,7 +27,6 @@ public class RouterBuilderVerticle extends AbstractVerticle {
     public void start(Promise<Void> startFuture) {
         RouterBuilder.rxCreate(vertx, restUrl)
                 .subscribe(routerBuilder -> {
-
                             handlers.getHandlers()
                                     .forEach(pair -> routerBuilder.operation(pair.getValue0()).handler(pair.getValue1()));
 

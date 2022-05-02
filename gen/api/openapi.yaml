@@ -1,0 +1,329 @@
+openapi: 3.0.3
+info:
+  description: SynergyAcademy
+  title: SynergyAcademy
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /students:
+    get:
+      operationId: getAllStudents
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while getting all students
+      x-accepts: application/json
+    post:
+      operationId: addStudent
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while adding new student
+      x-accepts: application/json
+  /students/{studentId}:
+    get:
+      operationId: getStudentById
+      parameters:
+      - explode: false
+        in: path
+        name: studentId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while getting student by id
+      x-accepts: application/json
+    put:
+      operationId: updateStudentById
+      parameters:
+      - explode: false
+        in: path
+        name: studentId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while updating student by id
+      x-accepts: application/json
+  /courses:
+    get:
+      operationId: getAllCourses
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while getting all courses
+      x-accepts: application/json
+    post:
+      operationId: addCourse
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while adding new course
+      x-accepts: application/json
+  /courses/{courseId}:
+    get:
+      operationId: getCourseById
+      parameters:
+      - explode: false
+        in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while getting course by id
+      x-accepts: application/json
+    put:
+      operationId: updateCourseById
+      parameters:
+      - explode: false
+        in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while updating course by id
+      x-accepts: application/json
+  /courses/{courseId}/exams:
+    get:
+      operationId: getExamsByCourseId
+      parameters:
+      - explode: false
+        in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while getting exams by course id
+      x-accepts: application/json
+    post:
+      operationId: addExam
+      parameters:
+      - explode: false
+        in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while adding new exam
+      x-accepts: application/json
+  /courses/{courseId}/students:
+    get:
+      operationId: getStudentsByCourseId
+      parameters:
+      - explode: false
+        in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while getting students by course id
+      x-accepts: application/json
+  /courses/{courseId}/educationprocess:
+    get:
+      operationId: getEducationProcessByCourseId
+      parameters:
+      - explode: false
+        in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while getting education process by course id
+      x-accepts: application/json
+  /educationprocess/{educationProcessId}:
+    get:
+      operationId: getEducationProcessById
+      parameters:
+      - explode: false
+        in: path
+        name: educationProcessId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while getting education process by id
+      x-accepts: application/json
+  /educationprocess/{educationProcessId}/grades:
+    get:
+      operationId: getGradesByEducationProcessId
+      parameters:
+      - explode: false
+        in: path
+        name: educationProcessId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while getting grades by education process id
+      x-accepts: application/json
+  /exams/{examId}:
+    get:
+      operationId: getExamById
+      parameters:
+      - explode: false
+        in: path
+        name: examId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while getting exam by id
+      x-accepts: application/json
+    put:
+      operationId: updateExamById
+      parameters:
+      - explode: false
+        in: path
+        name: examId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while updating exam by id
+      x-accepts: application/json
+  /exams/{examId}/students:
+    get:
+      operationId: getStudentsByExamId
+      parameters:
+      - explode: false
+        in: path
+        name: examId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while getting students by exam id
+      x-accepts: application/json
+  /exams/{examId}/results:
+    get:
+      operationId: getResultsByExamId
+      parameters:
+      - explode: false
+        in: path
+        name: examId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while getting results by exam id
+      x-accepts: application/json
+    put:
+      operationId: updateResults
+      parameters:
+      - explode: false
+        in: path
+        name: examId
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while updating results
+      x-accepts: application/json
+  /classifierservice/{tableName}:
+    get:
+      operationId: getClassifier
+      parameters:
+      - explode: false
+        in: path
+        name: tableName
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while getting classifier
+      x-accepts: application/json
+  /config/{type}:
+    get:
+      operationId: getConfig
+      parameters:
+      - explode: false
+        in: path
+        name: type
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: error while getting config
+      x-accepts: application/json
+components:
+  schemas: {}
+
