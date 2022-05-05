@@ -239,14 +239,31 @@ paths:
           description: OK
         500:
           description: error while updating results
-  /reports:
+  /reports/pieChart:
     get:
-      operationId: getReportsWithFunction
+      operationId: getReportsPieChart
       responses:
         200:
           description: OK
         500:
-          description: error while getting reports
+          description: error while getting pie chart report
+  /reports/tableReport:
+    get:
+      operationId: getReportsTable
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while getting table report
+
+  /reports/columnChart:
+    get:
+      operationId: getReportsColumnChart
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while getting column chart report
   /classifierservice/{tableName}:
     get:
       operationId: getClassifier

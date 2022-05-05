@@ -45,7 +45,9 @@ public class Handlers {
         handlersList.add(Pair.with("updateExamById", this::updateExamById));
         handlersList.add(Pair.with("getStudentsByExamId", this::getStudentsByExamId));
         handlersList.add(Pair.with("getResultsByExamId", this::getResultsByExamId));
-        handlersList.add(Pair.with("getReportsWithFunction", this::getReportsWithFunction));
+        handlersList.add(Pair.with("getReportsPieChart", this::getReportsPieChart));
+        handlersList.add(Pair.with("getReportsColumnChart", this::getReportsColumnChart));
+        handlersList.add(Pair.with("getReportsTable", this::getReportsTable));
         handlersList.add(Pair.with("getClassifier", this::getClassifier));
         handlersList.add(Pair.with("getConfig", this::getConfig));
 
@@ -166,14 +168,33 @@ public class Handlers {
                 );
     }
 
-    private void getReportsWithFunction(RoutingContext context) {
+    private void getReportsPieChart(RoutingContext context) {
         vertx.eventBus()
-                .<JsonArray>rxRequest("get.reports", new JsonArray())
+                .<JsonArray>rxRequest("get.reports.piechart", new JsonArray())
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())
                 );
     }
+
+    private void getReportsTable(RoutingContext context) {
+        vertx.eventBus()
+                .<JsonArray>rxRequest("get.reports.table", new JsonArray())
+                .subscribe(
+                        result -> addResponseHeaders(context).end(result.body().encodePrettily()),
+                        error -> context.response().setStatusCode(500).end(error.getMessage())
+                );
+    }
+
+    private void getReportsColumnChart(RoutingContext context) {
+        vertx.eventBus()
+                .<JsonArray>rxRequest("get.reports.columnchart", new JsonArray())
+                .subscribe(
+                        result -> addResponseHeaders(context).end(result.body().encodePrettily()),
+                        error -> context.response().setStatusCode(500).end(error.getMessage())
+                );
+    }
+
 
     private void getEducationProcessByCourseId(RoutingContext context) {
         vertx.eventBus()

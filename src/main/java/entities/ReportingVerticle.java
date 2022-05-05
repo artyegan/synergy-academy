@@ -14,14 +14,44 @@ public class ReportingVerticle extends AbstractVerticle {
 
     @Override
     public void start() {
-        vertx.eventBus().consumer("get.reports", this::getReportsWithFunction);
+        vertx.eventBus().consumer("get.reports.piechart", this::getReportsPieChart);
+        vertx.eventBus().consumer("get.reports.table", this::getReportsTable);
+        vertx.eventBus().consumer("get.reports.columnchart", this::getReportsColumnChart);
     }
 
-    private void getReportsWithFunction(Message<JsonArray> msg) {
+    private void getReportsPieChart(Message<JsonArray> msg) {
         getReportsWithFunctionRequest(
                 msg.body()
                 .add(new JsonObject()
                 .put("function", "analytics_number_of_courses_by_office"))
+        )
+                .subscribe(
+                        msg::reply,
+                        error -> {
+                            LOGGER.error(error);
+                            msg.fail(500, error.getMessage());
+                        });
+    }
+
+    private void getReportsTable(Message<JsonArray> msg) {
+        getReportsWithFunctionRequest(
+                msg.body()
+                        .add(new JsonObject()
+                                .put("function", "analytics_top_50_max_grades_in_all_courses"))
+        )
+                .subscribe(
+                        msg::reply,
+                        error -> {
+                            LOGGER.error(error);
+                            msg.fail(500, error.getMessage());
+                        });
+    }
+
+    private void getReportsColumnChart(Message<JsonArray> msg) {
+        getReportsWithFunctionRequest(
+                msg.body()
+                        .add(new JsonObject()
+                                .put("function", "analytics_student_grades_by_exam"))
         )
                 .subscribe(
                         msg::reply,
