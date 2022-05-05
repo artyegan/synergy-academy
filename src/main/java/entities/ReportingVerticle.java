@@ -17,6 +17,7 @@ public class ReportingVerticle extends AbstractVerticle {
         vertx.eventBus().consumer("get.reports.piechart", this::getReportsPieChart);
         vertx.eventBus().consumer("get.reports.table", this::getReportsTable);
         vertx.eventBus().consumer("get.reports.columnchart", this::getReportsColumnChart);
+        vertx.eventBus().consumer("get.reports.histogram", this::getReportsHistogram);
     }
 
     private void getReportsPieChart(Message<JsonArray> msg) {
@@ -52,6 +53,20 @@ public class ReportingVerticle extends AbstractVerticle {
                 msg.body()
                         .add(new JsonObject()
                                 .put("function", "analytics_student_grades_by_exam"))
+        )
+                .subscribe(
+                        msg::reply,
+                        error -> {
+                            LOGGER.error(error);
+                            msg.fail(500, error.getMessage());
+                        });
+    }
+
+    private void getReportsHistogram(Message<JsonArray> msg) {
+        getReportsWithFunctionRequest(
+                msg.body()
+                        .add(new JsonObject()
+                                .put("function", "analytics_number_of_students_by_universities"))
         )
                 .subscribe(
                         msg::reply,

@@ -255,7 +255,6 @@ paths:
           description: OK
         500:
           description: error while getting table report
-
   /reports/columnChart:
     get:
       operationId: getReportsColumnChart
@@ -264,6 +263,14 @@ paths:
           description: OK
         500:
           description: error while getting column chart report
+  /reports/histogram:
+    get:
+      operationId: getReportsHistogram
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while getting histogram report
   /classifierservice/{tableName}:
     get:
       operationId: getClassifier
@@ -278,6 +285,7 @@ paths:
           description: OK
         500:
           description: error while getting classifier
+
   /config/{type}:
     get:
       operationId: getConfig

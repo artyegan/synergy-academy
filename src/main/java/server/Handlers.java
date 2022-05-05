@@ -47,6 +47,7 @@ public class Handlers {
         handlersList.add(Pair.with("getResultsByExamId", this::getResultsByExamId));
         handlersList.add(Pair.with("getReportsPieChart", this::getReportsPieChart));
         handlersList.add(Pair.with("getReportsColumnChart", this::getReportsColumnChart));
+        handlersList.add(Pair.with("getReportsHistogram", this::getReportsHistogram));
         handlersList.add(Pair.with("getReportsTable", this::getReportsTable));
         handlersList.add(Pair.with("getClassifier", this::getClassifier));
         handlersList.add(Pair.with("getConfig", this::getConfig));
@@ -195,6 +196,14 @@ public class Handlers {
                 );
     }
 
+    private void getReportsHistogram(RoutingContext context) {
+        vertx.eventBus()
+                .<JsonArray>rxRequest("get.reports.histogram", new JsonArray())
+                .subscribe(
+                        result -> addResponseHeaders(context).end(result.body().encodePrettily()),
+                        error -> context.response().setStatusCode(500).end(error.getMessage())
+                );
+    }
 
     private void getEducationProcessByCourseId(RoutingContext context) {
         vertx.eventBus()
