@@ -45,6 +45,7 @@ public class Handlers {
         handlersList.add(Pair.with("updateExamById", this::updateExamById));
         handlersList.add(Pair.with("getStudentsByExamId", this::getStudentsByExamId));
         handlersList.add(Pair.with("getResultsByExamId", this::getResultsByExamId));
+        handlersList.add(Pair.with("sendInvitationLink", this::sendInvitationLink));
         handlersList.add(Pair.with("getReportsPieChart", this::getReportsPieChart));
         handlersList.add(Pair.with("getReportsColumnChart", this::getReportsColumnChart));
         handlersList.add(Pair.with("getReportsHistogram", this::getReportsHistogram));
@@ -287,6 +288,15 @@ public class Handlers {
                         new JsonObject()
                                 .put(ID, context.pathParam("examId"))
                                 .put(DATA, context.getBodyAsJson()))
+                .subscribe(
+                        result -> addResponseHeaders(context).end(result.body().encodePrettily()),
+                        error -> context.response().setStatusCode(500).end(error.getMessage())
+                );
+    }
+
+    private void sendInvitationLink(RoutingContext context) {
+        vertx.eventBus()
+                .<JsonArray>rxRequest("send.mail", context.getBodyAsJsonArray())
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())

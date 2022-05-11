@@ -15,6 +15,11 @@ dependencies {
     implementation 'io.vertx:vertx-web:4.2.4'
     implementation 'io.vertx:vertx-rx-java2:4.2.4'
     implementation 'io.vertx:vertx-web-openapi:4.2.4'
+    implementation 'io.vertx:vertx-web-client:4.2.7'
+    implementation 'io.vertx:vertx-auth:4.2.7'
+    implementation 'io.vertx:vertx-auth-oauth2:4.2.7'
+    implementation 'io.vertx:vertx-mail-client:4.2.7'
+
 
     //DB
     implementation 'io.vertx:vertx-pg-client:4.2.4'
@@ -34,6 +39,15 @@ dependencies {
 
     implementation 'org.javatuples:javatuples:1.2'
     implementation 'org.jetbrains:annotations:22.0.0'
+
+    implementation 'com.google.apis:google-api-services-forms:v1-rev20220329-1.32.1'
+    implementation 'com.google.auth:google-auth-library-oauth2-http:1.6.0'
+
+    implementation 'commons-codec:commons-codec:1.5'
+    implementation 'com.sun.mail:javax.mail:1.6.2'
+    implementation 'javax.mail:javax.mail-api:1.6.2'
+
+
 }
 
 test {

@@ -7,9 +7,12 @@ paths:
   /students:
     get:
       operationId: getAllStudents
+      description: Returns all students from all courses of all time
       responses:
         200:
           description: OK
+        204:
+          description: requested resource(students) returned empty response
         500:
           description: error while getting all students
     post:
@@ -239,6 +242,14 @@ paths:
           description: OK
         500:
           description: error while updating results
+  /email:
+    post:
+      operationId: sendInvitationLink
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while sending invitation link
   /reports/pieChart:
     get:
       operationId: getReportsPieChart

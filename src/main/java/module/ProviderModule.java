@@ -117,6 +117,11 @@ public class ProviderModule extends AbstractModule {
         return new CoursesVerticle(coursesDB);
     }
 
+    @ProvidesIntoSet
+    public Verticle provideMailVerticle() {
+        return new MailVerticle();
+    }
+
     @Inject
     @ProvidesIntoSet
     public Verticle provideExamsVerticle(@Named("examsDB") String examsDB) {
