@@ -38,6 +38,7 @@ public class DataServiceVerticle extends AbstractVerticle {
         vertx.eventBus().consumer("get.filter.service", this::getFilterHandler);
         vertx.eventBus().consumer("update.id.service", this::updateIdHandler);
         vertx.eventBus().consumer("get.function.service", this::getFunctionHandler);
+        vertx.eventBus().consumer("update.function.service", this::updateFunctionHandler);
         vertx.eventBus().consumer("add.service", this::addHandler);
     }
 
@@ -120,6 +121,31 @@ public class DataServiceVerticle extends AbstractVerticle {
                 });
     }
 
+    private void updateFunctionHandler(Message<JsonArray> msg) {
+        List<String> columnNames = new ArrayList<>();
+        String keyword = msg.body()
+                .getJsonObject(0)
+                .getString(KEYWORD);
+
+        msg.body().getJsonObject(0).getJsonArray("results").forEach(result -> {
+            var obj = (JsonObject) result;
+            pgPool.preparedQuery(SqlQueries.getFunctionQuery("updategradesfromclassmarker",
+                            Integer.parseInt(obj.getString("examId")),
+                            obj.getString("email"),
+                            Integer.parseInt(obj.getString("grade"))).getQuery())
+                    .rxExecute()
+                    .subscribe(
+                            res -> {
+                                LOGGER.info("Update succeed");
+                                msg.reply(new JsonArray());
+                            },
+                            error -> {
+                                LOGGER.error(error);
+                                msg.fail(500, error.getMessage());
+                            });
+        });
+    }
+
     private void updateIdHandler(Message<JsonObject> msg) {
         pgPool.preparedQuery(SqlQueries.updateQuery(
                         msg.body().getJsonArray(METADATA),
@@ -128,10 +154,10 @@ public class DataServiceVerticle extends AbstractVerticle {
                         msg.body().getJsonObject("data")).getQuery())
                 .rxExecute()
                 .subscribe(res -> {
-                    LOGGER.info(
-                            String.format(
-                                    "%s %s updated", msg.body().getString(KEYWORD), msg.body().getString("id")));
-                    msg.reply(new JsonObject().put("msg", msg.body().getString(KEYWORD) + " " +
+                            LOGGER.info(
+                                    String.format(
+                                            "%s %s updated", msg.body().getString(KEYWORD), msg.body().getString("id")));
+                            msg.reply(new JsonObject().put("msg", msg.body().getString(KEYWORD) + " " +
                                     msg.body().getString("id") +
                                     " updated"));
                         }, error -> {
@@ -148,7 +174,7 @@ public class DataServiceVerticle extends AbstractVerticle {
                         msg.body().getJsonObject("data")).getQuery())
                 .rxExecute()
                 .flatMap(rows -> pgPool.preparedQuery(SqlQueries.getFunctionQuery("getmaxid", msg.body().getString(KEYWORD))
-                        .getQuery())
+                                .getQuery())
                         .rxExecute())
                 .map(rows -> rows.iterator().next().getInteger(0))
                 .subscribe(res -> {

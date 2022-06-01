@@ -242,6 +242,19 @@ paths:
           description: OK
         500:
           description: error while updating results
+    post:
+      operationId: updateResultsClassmarker
+      parameters:
+        - in: path
+          name: examId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK
+        500:
+          description: error while updating results
   /email:
     post:
       operationId: sendInvitationLink

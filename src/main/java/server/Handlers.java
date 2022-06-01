@@ -45,6 +45,7 @@ public class Handlers {
         handlersList.add(Pair.with("updateExamById", this::updateExamById));
         handlersList.add(Pair.with("getStudentsByExamId", this::getStudentsByExamId));
         handlersList.add(Pair.with("getResultsByExamId", this::getResultsByExamId));
+        handlersList.add(Pair.with("updateResultsClassmarker", this::updateResultsClassmarker));
         handlersList.add(Pair.with("sendInvitationLink", this::sendInvitationLink));
         handlersList.add(Pair.with("getReportsPieChart", this::getReportsPieChart));
         handlersList.add(Pair.with("getReportsColumnChart", this::getReportsColumnChart));
@@ -276,6 +277,18 @@ public class Handlers {
                 .<JsonArray>rxRequest("get.results.function", new JsonArray().add(new JsonObject()
                         .put("keyword", context.pathParam("examId"))
                         .put("function", "getresultsbyexamid")))
+                .subscribe(
+                        result -> addResponseHeaders(context).end(result.body().encodePrettily()),
+                        error -> context.response().setStatusCode(500).end(error.getMessage())
+                );
+    }
+
+    private void updateResultsClassmarker(RoutingContext context) {
+        vertx.eventBus()
+                .<JsonArray>rxRequest("update.results.classmarker", new JsonArray().add(new JsonObject()
+                        .put("keyword", context.pathParam("examId"))
+                        )
+                )
                 .subscribe(
                         result -> addResponseHeaders(context).end(result.body().encodePrettily()),
                         error -> context.response().setStatusCode(500).end(error.getMessage())

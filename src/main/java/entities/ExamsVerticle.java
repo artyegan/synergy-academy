@@ -5,10 +5,14 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.core.eventbus.Message;
+import io.vertx.reactivex.ext.web.client.WebClient;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
+
+import java.time.Instant;
 
 import static meta.MetadataProvider.getMetadata;
 import static meta.MetadataProvider.getMetadataAndExtractId;
@@ -31,6 +35,7 @@ public class ExamsVerticle extends AbstractVerticle {
         vertx.eventBus().consumer("add.exam", this::addExam);
         vertx.eventBus().consumer("update.exams.id", this::updateExamById);
         vertx.eventBus().consumer("get.results.function", this::getResultsWithFunction);
+        vertx.eventBus().consumer("update.results.classmarker", this::updateResultsClassmarker);
     }
 
     private void getExamsByFilter(Message<JsonArray> msg) {
@@ -83,6 +88,46 @@ public class ExamsVerticle extends AbstractVerticle {
                             LOGGER.error(error);
                             msg.fail(500, error.getMessage());
                         });
+    }
+
+    private void updateResultsClassmarker(Message<JsonArray> msg) {
+        WebClient client = WebClient.create(vertx);
+
+        String md5Hex = DigestUtils
+                .md5Hex("o6GCc7OmwAkNCtqVF7qVjpqRJ0IuPrDI" +
+                        "yf2cnoKd5dXGf9aUv1gtjt8xeNIGcOQP7sPCXHLZ" +
+                        Instant.now().getEpochSecond());
+
+        client.getAbs("https://api.classmarker.com/v1/links/1217900/tests/1938918/recent_results.json")
+                .addQueryParam("api_key", "o6GCc7OmwAkNCtqVF7qVjpqRJ0IuPrDI")
+                .addQueryParam("signature", md5Hex)
+                .addQueryParam("timestamp", String.valueOf(Instant.now().getEpochSecond()))
+                .addQueryParam("finishedAfterTimestamp", "1650049943")
+                .rxSend().subscribe(
+                        res -> {
+                            var arr = res.bodyAsJsonObject().getJsonArray("results");
+                            var results = new JsonArray();
+                            System.out.println(res);
+
+                            for (int i = 0; i < arr.size(); ++i) {
+                                var result = arr.getJsonObject(i).getJsonObject("result");
+
+                                results.add(new JsonObject()
+                                        .put("examId", msg.body().getJsonObject(0).getString("keyword"))
+                                        .put("email", result.getString("email"))
+                                        .put("grade", result.getString("points_scored")));
+                            }
+
+                            msg.body().getJsonObject(0).put("results", results);
+
+                            vertx.eventBus().rxRequest("update.function.service", msg.body())
+                                    .subscribe(ress -> msg.reply(ress.body()),
+                                            LOGGER::error);
+                        },
+                        LOGGER::error
+                );
+
+
     }
 
     private Single<JsonArray> getExamsWithFilterRequest(JsonObject msgBody) {
