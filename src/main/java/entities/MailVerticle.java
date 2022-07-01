@@ -68,7 +68,7 @@ public class MailVerticle extends AbstractVerticle {
                 "Synergy Academy test link",
                 "https://www.classmarker.com/online-test/start/?quiz=nde6276ebbcd4a1e"
         );
-//test
+
 
         mailClient.rxSendMail(message)
                 .subscribe(
