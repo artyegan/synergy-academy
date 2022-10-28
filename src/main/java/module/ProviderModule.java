@@ -23,10 +23,8 @@ import services.ClassifierServiceVerticle;
 import services.DataServiceVerticle;
 
 import javax.inject.Named;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Path;
+import java.io.*;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
@@ -34,14 +32,15 @@ public class ProviderModule extends AbstractModule {
 
     private static final Logger LOGGER = LogManager.getLogger(ProviderModule.class);
 
-    private void setConfigsFile(@NotNull Path path) {
+    private void setConfigsFile(@NotNull final String fileName) {
+        InputStream stream = Objects.requireNonNull(getClass().getResourceAsStream(fileName));
         Properties properties = new Properties();
-        try (FileReader fileReader = new FileReader(path.toFile())) {
-            properties.load(fileReader);
+        try (InputStreamReader inputStreamReader = new InputStreamReader(stream)) {
+            properties.load(inputStreamReader);
             Names.bindProperties(binder(), properties);
             LOGGER.info("Properties loaded");
         } catch (FileNotFoundException e) {
-            LOGGER.error(String.format("The configuration file %s can not be found", path.getFileName().toString()));
+            LOGGER.error(String.format("The configuration file %s can not be found", fileName));
         } catch (IOException e) {
             LOGGER.error("I/O Exception during loading configuration");
         }
@@ -49,7 +48,7 @@ public class ProviderModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        setConfigsFile(Path.of("src/main/resources/configs.properties"));
+        setConfigsFile("/configs.properties");
     }
 
     @Inject

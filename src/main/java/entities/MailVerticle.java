@@ -21,12 +21,12 @@ public class MailVerticle extends AbstractVerticle {
 
     @Override
     public void start() throws Exception {
-        WebClient client = WebClient.create(vertx);
-
-        String md5Hex = DigestUtils
-                .md5Hex("o6GCc7OmwAkNCtqVF7qVjpqRJ0IuPrDI" +
-                        "yf2cnoKd5dXGf9aUv1gtjt8xeNIGcOQP7sPCXHLZ" +
-                        Instant.now().getEpochSecond());
+//        WebClient client = WebClient.create(vertx);
+//
+//        String md5Hex = DigestUtils
+//                .md5Hex("o6GCc7OmwAkNCtqVF7qVjpqRJ0IuPrDI" +
+//                        "yf2cnoKd5dXGf9aUv1gtjt8xeNIGcOQP7sPCXHLZ" +
+//                        Instant.now().getEpochSecond());
 
 //        client.getAbs("https://api.classmarker.com/v1.json")
 //                .addQueryParam("api_key", "o6GCc7OmwAkNCtqVF7qVjpqRJ0IuPrDI")
@@ -37,15 +37,15 @@ public class MailVerticle extends AbstractVerticle {
 //                        err -> System.out.println(err)
 //                );
 
-        client.getAbs("https://api.classmarker.com/v1/links/1217900/tests/1938918/recent_results.json")
-                .addQueryParam("api_key", "o6GCc7OmwAkNCtqVF7qVjpqRJ0IuPrDI")
-                .addQueryParam("signature", md5Hex)
-                .addQueryParam("timestamp", String.valueOf(Instant.now().getEpochSecond()))
-                .addQueryParam("finishedAfterTimestamp", "1650049943")
-                .rxSend().subscribe(
-                        res -> System.out.println(res.body()),
-                        err -> System.out.println(err)
-                );
+//        client.getAbs("https://api.classmarker.com/v1/links/1217900/tests/1938918/recent_results.json")
+//                .addQueryParam("api_key", "o6GCc7OmwAkNCtqVF7qVjpqRJ0IuPrDI")
+//                .addQueryParam("signature", md5Hex)
+//                .addQueryParam("timestamp", String.valueOf(Instant.now().getEpochSecond()))
+//                .addQueryParam("finishedAfterTimestamp", "1650049943")
+//                .rxSend().subscribe(
+//                        res -> System.out.println(res.body()),
+//                        err -> System.out.println(err)
+//                );
 
         vertx.eventBus().consumer("send.mail", this::sendMailHandler);
 

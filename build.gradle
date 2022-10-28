@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'application'
 }
 
 group 'org.example'
@@ -48,6 +48,23 @@ dependencies {
     implementation 'javax.mail:javax.mail-api:1.6.2'
 
 
+}
+
+application {
+    mainClass = 'Server'
+}
+
+task createJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'Server'
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    with jar
 }
 
 test {
