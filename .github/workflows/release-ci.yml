@@ -1,0 +1,28 @@
+name: synergy-academy-pipeline
+
+on:
+  push:
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+#        uses: actions/checkout@v2.5.0
+        run: git clone --depth 2 --single-branch --branch $GITHUB_REF_NAME https://github.com/artyegan/synergy-academy.git . && echo $GITHUB_REF_NAME
+      - name: Setup JDK
+        uses: actions/setup-java@v3.8.0
+        with:
+          java-version: 16
+          distribution: corretto
+      - name: Gradle permissions
+        run: chmod +x gradlew
+      - name: Gradle build
+        run: ./gradlew build
+      - name: Run tests
+        run: ./gradlew test
+      - name: Create JAR
+        run: ./gradlew -Pversion=$(./gradlew -q -Pversion=$(git tag --points-at HEAD^1) changeVersion) createJar
+      - name: Create tag
+        run: git config --global user.name 'artyegan' && git config --global user.email 'artyegan@users.noreply.github.com' && git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/artyegan/synergy-academy && git tag $(./gradlew -q -Pversion=$(git tag --points-at HEAD^1) changeVersion) && git push origin $(./gradlew -q -Pversion=$(git tag --points-at HEAD^1) changeVersion)

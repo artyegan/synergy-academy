@@ -3,7 +3,6 @@ plugins {
 }
 
 group 'org.example'
-version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -69,4 +68,10 @@ task createJar(type: Jar) {
 
 test {
     useJUnitPlatform()
+}
+
+tasks.register("changeVersion") {
+    List<Integer> versionParts = version.split('\\.')
+    versionParts.set(2, ++versionParts.get(2))
+    println versionParts.join('.')
 }
