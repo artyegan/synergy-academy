@@ -1,0 +1,15 @@
+name: synergy-academy-pipeline
+
+on:
+  push:
+    branches:
+      - master
+      
+jobs:
+    build:
+      name: build
+      runs-on: ubuntu-latest
+      steps:
+      - name: checkout
+        run: git checkout master
+    
