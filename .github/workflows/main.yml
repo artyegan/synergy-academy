@@ -11,5 +11,5 @@ jobs:
       runs-on: ubuntu-latest
       steps:
       - name: checkout
-        run: git checkout master
+        run: ls
     
