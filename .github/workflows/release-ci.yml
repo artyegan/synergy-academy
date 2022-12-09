@@ -23,6 +23,11 @@ jobs:
       - name: Run tests
         run: ./gradlew test
       - name: Create JAR
-        run: ./gradlew -Pversion=$(./gradlew -q -Pversion=$(git tag --points-at HEAD^1) changeVersion) createJar
+        run: NEXT_VERSION=$(./gradlew -q -Pversion=$(git tag --points-at HEAD^1) changeVersion) && 
+          ./gradlew -Pversion=$NEXT_VERSION createJar
       - name: Create tag
-        run: git config --global user.name 'artyegan' && git config --global user.email 'artyegan@users.noreply.github.com' && git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/artyegan/synergy-academy && git tag $(./gradlew -q -Pversion=$(git tag --points-at HEAD^1) changeVersion) && git push origin $(./gradlew -q -Pversion=$(git tag --points-at HEAD^1) changeVersion)
+        run: git config --global user.name 'artyegan' && 
+          git config --global user.email 'artyegan@users.noreply.github.com' && 
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/artyegan/synergy-academy && 
+          git tag $NEXT_VERSION && 
+          git push origin $NEXT_VERSION
